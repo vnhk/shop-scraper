@@ -1,4 +1,4 @@
-package com.bervan.shopwebscraper.file;
+package com.bervan.shopwebscraper.save;
 
 import java.time.LocalDate;
 

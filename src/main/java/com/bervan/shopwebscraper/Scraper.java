@@ -1,7 +1,8 @@
 package com.bervan.shopwebscraper;
 
-import com.bervan.shopwebscraper.file.ExcelService;
-import com.bervan.shopwebscraper.file.JsonService;
+import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.ExcelService;
+import com.bervan.shopwebscraper.save.JsonService;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
@@ -29,10 +30,12 @@ public class Scraper {
     private final ExecutorService executor = Executors.newFixedThreadPool(30);
     private final JsonService jsonService;
     private final ExcelService excelService;
+    private final StatServerService statServerService;
 
-    public Scraper(JsonService jsonService, ExcelService excelService) {
+    public Scraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
         this.jsonService = jsonService;
         this.excelService = excelService;
+        this.statServerService = statServerService;
     }
 
     public void run() {
@@ -52,8 +55,15 @@ public class Scraper {
         waitForOffers(mediaExpertOffers, tasks);
 
         System.out.printf("Processed %d offers.\n", mediaExpertOffers.size());
-        jsonService.save(mediaExpertOffers, "products_shop_scrap-");
-        excelService.save(mediaExpertOffers, "products_shop_scrap-");
+        try {
+            jsonService.save(mediaExpertOffers, "products_shop_scrap-");
+            excelService.save(mediaExpertOffers, "products_shop_scrap-");
+        } catch (Exception e) {
+            System.err.println("Could not save to file!");
+            e.printStackTrace();
+        }
+
+        statServerService.save(mediaExpertOffers);
     }
 
     private void waitForOffers(List<Offer> mediaExpertOffers, List<Future<List<Offer>>> tasks) {

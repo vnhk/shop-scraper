@@ -3,12 +3,12 @@ package com.bervan.shopwebscraper;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 public class ConfigProduct {
     private String name;
-    private List<String> categories;
+    private Set<String> categories;
     private String url;
 }

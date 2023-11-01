@@ -1,4 +1,4 @@
-package com.bervan.shopwebscraper.file;
+package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
 import com.google.gson.Gson;
