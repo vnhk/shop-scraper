@@ -1,0 +1,96 @@
+[
+  {
+    "shopName": "Media Expert",
+    "baseUrl": "https://www.mediaexpert.pl",
+    "products": [
+      {
+        "name": "Nintendo Switch - Gry",
+        "categories": [
+          "Gry",
+          "Nintendo",
+          "Nintendo Switch"
+        ],
+        "url": "/gaming/gry/gry-nintendo-switch"
+      },
+      {
+        "name": "Odkurzacze pionowe",
+        "categories": [
+          "Sprzątanie",
+          "AGD",
+          "Odkurzacze",
+          "Odkurzacze pionowe"
+        ],
+        "url": "/agd-male/sprzatanie/odkurzacze-pionowe"
+      },
+      {
+        "name": "Myszki Uniwersalne",
+        "categories": [
+          "Myszki",
+          "Myszki Uniwersalne"
+        ],
+        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-uniwersalne"
+      },
+      {
+        "name": "Myszki Gamingowe",
+        "categories": [
+          "Myszki",
+          "Myszki Gamingowe"
+        ],
+        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-dla-graczy"
+      },
+      {
+        "name": "Słuchawki",
+        "categories": [
+          "Słuchawki",
+          "Słuchawki z mikrofonem"
+        ],
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-z-mikrofonem"
+      },
+      {
+        "name": "Słuchawki Gamingowe",
+        "categories": [
+          "Słuchawki",
+          "Słuchawki Gamingowe",
+          "Słuchawki z mikrofonem"
+        ],
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-gamingowe"
+      },
+      {
+        "name": "Smartwatche",
+        "categories": [
+          "Smartwatche"
+        ],
+        "url": "/smartfony-i-zegarki/smartwatche-i-zegarki/smartwatche"
+      },
+      {
+        "name": "Playstation 5 - Gry",
+        "categories": [
+          "Gry",
+          "Sony",
+          "Playstation",
+          "Playstation 5"
+        ],
+        "url": "/gaming/gry/gry-ps5"
+      },
+      {
+        "name": "Głośniki komputerowe",
+        "categories": [
+          "Głośniki",
+          "Głośniki Komputerowe"
+        ],
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/glosniki-komputerowe"
+      },
+      {
+        "name": "Playstation 5 - Gry",
+        "categories": [
+          "Gry",
+          "Sony",
+          "Playstation",
+          "Playstation 5",
+          "Playstation 4"
+        ],
+        "url": "/gaming/gry/gry-ps4/platforma_playstation-5"
+      }
+    ]
+  }
+]
