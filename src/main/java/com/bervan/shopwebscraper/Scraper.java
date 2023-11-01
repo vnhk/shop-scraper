@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -78,9 +79,11 @@ public class Scraper {
                 int pages = getNumberOfPages(driver);
                 processPages(driver, pages, productOffers, url);
 
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-uuuu HH:mm:ss");
+                String formattedDate = simpleDateFormat.format(now);
                 for (Offer offer : productOffers) {
-                    offer.put("Time", now.getTime());
-                    offer.put("Date", now);
+                    offer.put("Date", now.getTime());
+                    offer.put("Formatted Date", formattedDate);
                     offer.put("Product List Name", product.getName());
                     offer.put("Categories", product.getCategories());
                     offer.put("Product List Url", product.getUrl());
