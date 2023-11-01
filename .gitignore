@@ -8,8 +8,8 @@ mvnw.cmd
 mvnw
 .mvn
 
-.xlsx
-.json
+*.xlsx
+*.json
 
 ### STS ###
 .apt_generated
