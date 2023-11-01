@@ -157,7 +157,9 @@ public class Scraper {
             if (attributes != null) {
                 List<Element> items = attributes.select(".item");
                 for (Element item : items) {
-                    String attributeName = item.select(".attribute-name").text().trim();
+                    String attributeName = item.select(".attribute-name").text()
+                            .trim()
+                            .replace("\u00a0", "");
                     if (attributeName.endsWith(":")) {
                         attributeName = attributeName.substring(0, attributeName.length() - 1);
                     }
@@ -165,6 +167,7 @@ public class Scraper {
                     if (!attributeName.isBlank()) {
                         o.put(attributeName, Arrays.stream(attributeValues.split(","))
                                 .map(String::trim)
+                                .map(e -> e.replace("\u00a0", ""))
                                 .filter(Strings::isNotEmpty)
                                 .collect(Collectors.toList()));
                     }
