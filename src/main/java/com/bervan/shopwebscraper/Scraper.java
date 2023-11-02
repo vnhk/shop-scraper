@@ -1,8 +1,8 @@
 package com.bervan.shopwebscraper;
 
-import com.bervan.shopwebscraper.save.StatServerService;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
+import com.bervan.shopwebscraper.save.StatServerService;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
@@ -89,7 +89,7 @@ public class Scraper {
                 int pages = getNumberOfPages(driver);
                 processPages(driver, pages, productOffers, url);
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-uuuu HH:mm:ss");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 String formattedDate = simpleDateFormat.format(now);
                 for (Offer offer : productOffers) {
                     offer.put("Date", now.getTime());
@@ -102,11 +102,10 @@ public class Scraper {
                 return productOffers;
             } catch (Exception e) {
                 System.err.println("Could not parse product " + product.getName() + "!");
-                e.printStackTrace();
+                throw new RuntimeException("Could not parse product " + product.getName() + "!");
             } finally {
                 driver.quit();
             }
-            return new ArrayList<>();
         });
     }
 
@@ -157,9 +156,9 @@ public class Scraper {
 
     private void mediaExpertParseOffers(List<Element> offerElements, List<Offer> productOffers) {
         for (Element offer : offerElements) {
-            String offerName = getFirstIfFoundTextByCssQuery(offer, ".name > a");
-            String href = getFirstIfFoundAttrByCssQuery(offer, ".name > a", "href");
-            String offerPrice = offer.select(".main-price .whole").text();
+            String offerName = sanitize(getFirstIfFoundTextByCssQuery(offer, ".name > a"));
+            String href = sanitize(getFirstIfFoundAttrByCssQuery(offer, ".name > a", "href"));
+            String offerPrice = sanitize(offer.select(".main-price .whole").text());
 
             Offer o = new Offer();
             o.put("Name", offerName);
@@ -170,9 +169,8 @@ public class Scraper {
             if (attributes != null) {
                 List<Element> items = attributes.select(".item");
                 for (Element item : items) {
-                    String attributeName = item.select(".attribute-name").text()
-                            .trim()
-                            .replace("\u00a0", "");
+                    String attributeName = sanitize(item.select(".attribute-name").text()
+                            .trim());
                     if (attributeName.endsWith(":")) {
                         attributeName = attributeName.substring(0, attributeName.length() - 1);
                     }
@@ -180,7 +178,7 @@ public class Scraper {
                     if (!attributeName.isBlank()) {
                         o.put(attributeName, Arrays.stream(attributeValues.split(","))
                                 .map(String::trim)
-                                .map(e -> e.replace("\u00a0", ""))
+                                .map(this::sanitize)
                                 .filter(Strings::isNotEmpty)
                                 .collect(Collectors.toList()));
                     }
@@ -189,6 +187,12 @@ public class Scraper {
 
             productOffers.add(o);
         }
+    }
+
+    private String sanitize(String text) {
+        return text.replace(" ", "")
+                .replace("\\u0027", "'")
+                .replace("\\u0026", "&");
     }
 
     private String getFirstIfFoundTextByCssQuery(Element offer, String cssQuery) {

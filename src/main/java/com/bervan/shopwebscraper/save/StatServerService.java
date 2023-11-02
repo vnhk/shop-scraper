@@ -30,6 +30,13 @@ public class StatServerService {
                     i,
                     partition.size(),
                     result.get("savedProducts"));
+            List<String> messages = (List) result.get("messages");
+            if (!messages.isEmpty()) {
+                System.out.println("Not all products have been saved due to the following reasons:");
+                for (String message : messages) {
+                    System.out.println("- " + message);
+                }
+            }
             i++;
         }
         System.out.println("Saved to the database.");
