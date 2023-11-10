@@ -4,7 +4,7 @@ import com.bervan.shopwebscraper.save.StatServerService;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 
-public class ConsoleStarter {
+public class ConsoleScraperStarter {
 
     public static void main(String[] args) {
         JsonService service = new JsonService();
