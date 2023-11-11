@@ -63,7 +63,6 @@ public class Scraper {
             e.printStackTrace();
         }
 
-        statServerService.save(mediaExpertOffers);
     }
 
     private void waitForOffers(List<Offer> mediaExpertOffers, List<Future<List<Offer>>> tasks) {
@@ -99,6 +98,9 @@ public class Scraper {
                     offer.put("Product List Url", product.getUrl());
                     offer.put("Shop", config.getShopName());
                 }
+
+                statServerService.save(productOffers);
+
                 return productOffers;
             } catch (Exception e) {
                 System.err.println("Could not parse product " + product.getName() + "!");
