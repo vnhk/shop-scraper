@@ -13,6 +13,31 @@
         "url": "/gaming/gry/gry-nintendo-switch"
       },
       {
+        "name": "Głośniki Bluetooth",
+        "categories": [
+          "Głośniki",
+          "Głośniki Bluetooth",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/telewizory-i-rtv/hi-fi-audio/glosniki-mobilne"
+      },
+      {
+        "name": "Monitory",
+        "categories": [
+          "Monitory",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/komputery-i-tablety/monitory-led"
+      },
+      {
+        "name": "Klawiatury",
+        "categories": [
+          "Klawiatury",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/komputery-i-tablety/klawiatury-komputerowe/klawiatury"
+      },
+      {
         "name": "Odkurzacze pionowe",
         "categories": [
           "Sprzątanie",
@@ -34,7 +59,8 @@
         "name": "Myszki Gamingowe",
         "categories": [
           "Myszki",
-          "Myszki Gamingowe"
+          "Myszki Gamingowe",
+          "Akcesoria komputerowe"
         ],
         "url": "/komputery-i-tablety/myszy-komputerowe/myszki-dla-graczy"
       },
@@ -42,7 +68,8 @@
         "name": "Słuchawki",
         "categories": [
           "Słuchawki",
-          "Słuchawki z mikrofonem"
+          "Słuchawki z mikrofonem",
+          "Akcesoria komputerowe"
         ],
         "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-z-mikrofonem"
       },
@@ -51,7 +78,8 @@
         "categories": [
           "Słuchawki",
           "Słuchawki Gamingowe",
-          "Słuchawki z mikrofonem"
+          "Słuchawki z mikrofonem",
+          "Akcesoria komputerowe"
         ],
         "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-gamingowe"
       },
@@ -76,9 +104,106 @@
         "name": "Głośniki komputerowe",
         "categories": [
           "Głośniki",
-          "Głośniki Komputerowe"
+          "Głośniki komputerowe",
+          "Akcesoria komputerowe"
         ],
         "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/glosniki-komputerowe"
+      },
+      {
+        "name": "Karty Graficzne",
+        "categories": [
+          "Karty graficzne",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/karty-graficzne"
+      },
+      {
+        "name": "Procesory",
+        "categories": [
+          "Procesory",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/procesory"
+      },
+      {
+        "name": "Pamięć RAM",
+        "categories": [
+          "Pamięć RAM",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/pamieci-ram"
+      },
+      {
+        "name": "Płyty Główne",
+        "categories": [
+          "Płyty główne",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/plyty-glowne"
+      },
+      {
+        "name": "Dyski Wewnętrzne SSD",
+        "categories": [
+          "Podzespoły komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski SSD",
+          "Dyski wewnętrzne"
+        ],
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-wewnetrzne-ssd"
+      },
+      {
+        "name": "Dyski Wewnętrzne SSD M2",
+        "categories": [
+          "Podzespoły komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski SSD",
+          "Dyski SSD M2",
+          "Dyski wewnętrzne"
+        ],
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-ssd-m2"
+      },
+      {
+        "name": "Tablety",
+        "categories": [
+          "Tablety"
+        ],
+        "url": "/komputery-i-tablety/tablety-i-e-booki/tablety"
+      },
+      {
+        "name": "Czytniki e-booków",
+        "categories": [
+          "Czytniki e-book"
+        ],
+        "url": "/komputery-i-tablety/tablety-i-e-booki/czytniki-e-bookow"
+      },
+      {
+        "name": "Dyski Zewnętrzne SSD",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski SSD",
+          "Dyski zewnętrzne"
+        ],
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-ssd"
+      },
+      {
+        "name": "Dyski Zewnętrzne HDD",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski HDD",
+          "Dyski zewnętrzne"
+        ],
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-hdd"
+      },
+      {
+        "name": "Pendrive",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Pendrive"
+        ],
+        "url": "/komputery-i-tablety/dyski-i-pamieci/pamieci-flash-pendrive"
       },
       {
         "name": "Playstation 5 - Gry",

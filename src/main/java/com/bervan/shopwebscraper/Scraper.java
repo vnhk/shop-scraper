@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class Scraper {
     private final ChromeOptions options = new ChromeOptions();
-    private final ExecutorService executor = Executors.newFixedThreadPool(30);
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final JsonService jsonService;
     private final ExcelService excelService;
     private final StatServerService statServerService;
