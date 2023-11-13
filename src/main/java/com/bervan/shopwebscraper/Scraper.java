@@ -3,8 +3,6 @@ package com.bervan.shopwebscraper;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.StatServerService;
-import com.google.gson.Gson;
-import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,21 +10,16 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
-@Service
-public class Scraper {
-    private final ChromeOptions options = new ChromeOptions();
+public abstract class Scraper {
+    protected final ChromeOptions options = new ChromeOptions();
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final JsonService jsonService;
     private final ExcelService excelService;
@@ -38,31 +31,43 @@ public class Scraper {
         this.statServerService = statServerService;
     }
 
-    public void run() {
-        options.addArguments("--blink-settings=imagesEnabled=false");
+    public void run(ConfigRoot config, Date scrapDate) {
+        List<Offer> offers = new ArrayList<>();
+        options();
 
-        Date now = new Date();
-        List<Offer> mediaExpertOffers = new ArrayList<>();
-        List<ConfigRoot> roots = loadProductsFromConfig("/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json");
-        ConfigRoot mediaExpert = roots.get(0);
-        String baseUrl = mediaExpert.getBaseUrl();
+        String baseUrl = config.getBaseUrl();
 
         List<Future<List<Offer>>> tasks = new ArrayList<>();
-        for (ConfigProduct product : mediaExpert.getProducts()) {
-            Future<List<Offer>> offers = processProduct(now, mediaExpert, baseUrl, product);
-            tasks.add(offers);
+        for (ConfigProduct product : config.getProducts()) {
+            Future<List<Offer>> offerTasks = processProduct(scrapDate, config, baseUrl, product);
+            tasks.add(offerTasks);
         }
-        waitForOffers(mediaExpertOffers, tasks);
 
-        System.out.printf("Processed %d offers.\n", mediaExpertOffers.size());
+        waitForOffers(offers, tasks);
+
+        System.out.printf("Processed %d offers.\n", offers.size());
+        saveToFile(config, offers);
+    }
+
+    protected void options() {
+        options.addArguments("--blink-settings=imagesEnabled=false");
+    }
+
+    private void saveToFile(ConfigRoot config, List<Offer> offers) {
         try {
-            jsonService.save(mediaExpertOffers, "products_shop_scrap-");
-            excelService.save(mediaExpertOffers, "products_shop_scrap-");
+            String filenamePrefix = getFilenamePrefix(config);
+            jsonService.save(offers, filenamePrefix);
+            excelService.save(offers, filenamePrefix);
         } catch (Exception e) {
             System.err.println("Could not save to file!");
             e.printStackTrace();
         }
+    }
 
+    protected String getFilenamePrefix(ConfigRoot config) {
+        String shopName = config.getShopName().replaceAll(" ", "_")
+                .toUpperCase(Locale.ROOT);
+        return "products_shop_scrap_" + shopName + "-";
     }
 
     private void waitForOffers(List<Offer> mediaExpertOffers, List<Future<List<Offer>>> tasks) {
@@ -83,8 +88,7 @@ public class Scraper {
                 List<Offer> productOffers = new ArrayList<>();
 
                 String url = baseUrl + product.getUrl();
-                driver.get(url + "?limit=50");
-
+                driver.get(getFirstPageUrlWithParams(url));
                 int pages = getNumberOfPages(driver);
                 processPages(driver, pages, productOffers, url);
 
@@ -111,93 +115,64 @@ public class Scraper {
         });
     }
 
-    private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
-        Gson gson = new Gson();
+    protected abstract String getFirstPageUrlWithParams(String url);
 
-        try (FileReader reader = new FileReader(configFilePath)) {
-            return List.of(gson.fromJson(reader, ConfigRoot[].class));
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load config!");
-        }
-    }
+    protected abstract int getNumberOfPages(WebDriver driver);
 
-    private static int getNumberOfPages(WebDriver driver) {
-        String pageSource = driver.getPageSource();
-        Document parsed = Jsoup.parse(pageSource);
-        String pages = parsed.getElementsByClass("pagination").get(0)
-                .getElementsByClass("from").get(0).text();
-        return Integer.parseInt(pages.split("z ")[1]);
-    }
-
-    private void loadPageAndProcess(WebDriver driver, List<Offer> productOffers) {
+    protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers) {
         Document doc = Jsoup.parse(driver.getPageSource());
-        List<Element> offerElements = findOffers(doc);
-
-        if (offerElements.size() < 25) {
-            // Scroll down to load more offers if needed
-            // Implement scrolling logic
-        }
-
-        mediaExpertParseOffers(offerElements, productOffers);
+        List<Element> offerElements = loadAllOffersTiles(doc);
+        parseOffers(offerElements, productOffers);
     }
 
-    private void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url) {
+    protected void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url) {
         loadPageAndProcess(driver, productOffers);
 
         for (int currentPage = 2; currentPage <= pages; currentPage++) {
-            String processedUrl = url + (url.contains("?") ? "&" : "?") + "limit=50&page=" + currentPage;
+            String processedUrl = getUrlWithParametersForPage(url, currentPage);
             System.out.println("Current url: " + processedUrl);
             driver.get(processedUrl);
             loadPageAndProcess(driver, productOffers);
         }
     }
 
-    private static List<Element> findOffers(Document doc) {
-        return doc.getElementsByClass("offer-box");
-    }
 
-    private void mediaExpertParseOffers(List<Element> offerElements, List<Offer> productOffers) {
-        for (Element offer : offerElements) {
-            String offerName = sanitize(getFirstIfFoundTextByCssQuery(offer, ".name > a"));
-            String href = sanitize(getFirstIfFoundAttrByCssQuery(offer, ".name > a", "href"));
-            String offerPrice = sanitize(offer.select(".main-price .whole").text());
+    protected abstract String getUrlWithParametersForPage(String url, int currentPage);
 
-            Offer o = new Offer();
-            o.put("Name", offerName);
-            o.put("Price", offerPrice);
-            o.put("Offer Url", href);
+    protected abstract List<Element> loadAllOffersTiles(Document doc);
 
-            Element attributes = offer.select(".list.attributes").first();
-            if (attributes != null) {
-                List<Element> items = attributes.select(".item");
-                for (Element item : items) {
-                    String attributeName = sanitize(item.select(".attribute-name").text()
-                            .trim());
-                    if (attributeName.endsWith(":")) {
-                        attributeName = attributeName.substring(0, attributeName.length() - 1);
-                    }
-                    String attributeValues = item.select(".attribute-values").text().trim();
-                    if (!attributeName.isBlank()) {
-                        o.put(attributeName, Arrays.stream(attributeValues.split(","))
-                                .map(String::trim)
-                                .map(this::sanitize)
-                                .filter(Strings::isNotEmpty)
-                                .collect(Collectors.toList()));
-                    }
-                }
-            }
+    protected void parseOffers(List<Element> offerElements, List<Offer> productOffers) {
+        for (Element offerElement : offerElements) {
+            String offerName = sanitize(getOfferName(offerElement));
+            String href = sanitize(getOfferHref(offerElement));
+            String offerPrice = sanitize(getOfferPrice(offerElement));
 
-            productOffers.add(o);
+            Offer offer = new Offer();
+            offer.put("Name", offerName);
+            offer.put("Price", offerPrice);
+            offer.put("Offer Url", href);
+
+            processProductAdditionalAttributes(offerElement, offer);
+
+            productOffers.add(offer);
         }
     }
 
-    private String sanitize(String text) {
+    protected abstract void processProductAdditionalAttributes(Element offerElement, Offer offer);
+
+    protected abstract String getOfferPrice(Element offer);
+
+    protected abstract String getOfferHref(Element offer);
+
+    protected abstract String getOfferName(Element offer);
+
+    protected String sanitize(String text) {
         return text.replace(" ", "")
                 .replace("\\u0027", "'")
                 .replace("\\u0026", "&");
     }
 
-    private String getFirstIfFoundTextByCssQuery(Element offer, String cssQuery) {
+    protected String getFirstIfFoundTextByCssQuery(Element offer, String cssQuery) {
         Elements elements = offer.select(cssQuery);
         if (elements.first() == null) {
             return elements.text();
@@ -205,7 +180,7 @@ public class Scraper {
         return elements.first().text();
     }
 
-    private String getFirstIfFoundAttrByCssQuery(Element offer, String cssQuery, String attr) {
+    protected String getFirstIfFoundAttrByCssQuery(Element offer, String cssQuery, String attr) {
         Elements elements = offer.select(cssQuery);
         if (elements.first() == null) {
             return elements.attr(attr);

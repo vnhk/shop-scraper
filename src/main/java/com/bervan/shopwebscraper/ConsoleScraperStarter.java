@@ -1,8 +1,11 @@
 package com.bervan.shopwebscraper;
 
-import com.bervan.shopwebscraper.save.StatServerService;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
+import com.bervan.shopwebscraper.save.StatServerService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConsoleScraperStarter {
 
@@ -10,7 +13,10 @@ public class ConsoleScraperStarter {
         JsonService service = new JsonService();
         ExcelService excelService = new ExcelService();
         StatServerService statServerService = new StatServerService();
-        Scraper scraper = new Scraper(service, excelService, statServerService);
+        Map<String, Scraper> scrapers = new HashMap<>();
+        scrapers.put("Media Markt", new MediaMarktScraper(service, excelService, statServerService));
+        scrapers.put("Media Expert", new MediaExpertScraper(service, excelService, statServerService));
+        ScrapProcessor scraper = new ScrapProcessor(scrapers);
         scraper.run();
     }
 }
