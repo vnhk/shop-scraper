@@ -36,7 +36,8 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(Document doc) {
+    protected List<Element> loadAllOffersTiles(WebDriver driver) {
+        Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("offer-box");
     }
 

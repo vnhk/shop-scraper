@@ -3,8 +3,6 @@ package com.bervan.shopwebscraper;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.StatServerService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
@@ -124,8 +122,7 @@ public abstract class Scraper {
     protected abstract int getNumberOfPages(WebDriver driver);
 
     protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers) {
-        Document doc = Jsoup.parse(driver.getPageSource());
-        List<Element> offerElements = loadAllOffersTiles(doc);
+        List<Element> offerElements = loadAllOffersTiles(driver);
         parseOffers(offerElements, productOffers);
     }
 
@@ -143,7 +140,7 @@ public abstract class Scraper {
 
     protected abstract String getUrlWithParametersForPage(String url, int currentPage);
 
-    protected abstract List<Element> loadAllOffersTiles(Document doc);
+    protected abstract List<Element> loadAllOffersTiles(WebDriver driver);
 
     protected void parseOffers(List<Element> offerElements, List<Offer> productOffers) {
         for (Element offerElement : offerElements) {

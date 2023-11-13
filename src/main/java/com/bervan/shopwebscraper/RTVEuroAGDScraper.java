@@ -55,27 +55,28 @@ public class RTVEuroAGDScraper extends Scraper {
 
 
     @Override
-    protected List<Element> loadAllOffersTiles(Document doc) {
-        Elements offers = loadOffers(doc);
+    protected List<Element> loadAllOffersTiles(WebDriver driver) {
+        Elements offers = loadOffers(driver);
 
         int tries = 0;
-        //page can be not loaded yet, try wait 30s to load content
+        //page can be not loaded yet, try wait 15s to load content
         //or it is the last page
         //to refactor
-        while (offers.size() < Integer.parseInt(PAGE_SIZE) || tries > 30) {
+        while (offers.size() < Integer.parseInt(PAGE_SIZE) || tries < 15) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            offers = loadOffers(doc);
+            offers = loadOffers(driver);
             tries++;
         }
 
         return offers;
     }
 
-    private Elements loadOffers(Document doc) {
+    private Elements loadOffers(WebDriver driver) {
+        Document doc = Jsoup.parse(driver.getPageSource());
         Elements offers = doc.getElementsByClass("product-list__product-box");
         offers.addAll(doc.getElementsByClass("product-paginator__box-container--first"));
         return offers;
