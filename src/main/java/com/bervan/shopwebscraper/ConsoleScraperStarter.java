@@ -16,6 +16,7 @@ public class ConsoleScraperStarter {
         Map<String, Scraper> scrapers = new HashMap<>();
         scrapers.put("Media Markt", new MediaMarktScraper(service, excelService, statServerService));
         scrapers.put("Media Expert", new MediaExpertScraper(service, excelService, statServerService));
+        scrapers.put("RTV Euro AGD", new RTVEuroAGDScraper(service, excelService, statServerService));
         ScrapProcessor scraper = new ScrapProcessor(scrapers);
         scraper.run();
     }

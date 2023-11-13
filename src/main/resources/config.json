@@ -1,5 +1,18 @@
 [
   {
+    "shopName": "RTV Euro AGD",
+    "baseUrl": "https://www.euro.com.pl",
+    "products": [
+      {
+        "name": "Smartfony",
+        "categories": [
+          "Smartfony"
+        ],
+        "url": "/telefony-komorkowe.bhtml"
+      }
+    ]
+  },
+  {
     "shopName": "Media Expert",
     "baseUrl": "https://www.mediaexpert.pl",
     "products": [
@@ -89,6 +102,13 @@
           "Smartwatche"
         ],
         "url": "/smartfony-i-zegarki/smartwatche-i-zegarki/smartwatche"
+      },
+      {
+        "name": "Smartfony",
+        "categories": [
+          "Smartfony"
+        ],
+        "url": "/smartfony-i-zegarki/smartfony"
       },
       {
         "name": "Playstation 5 - Gry",

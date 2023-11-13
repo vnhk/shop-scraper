@@ -58,7 +58,7 @@ public class MediaExpertScraper extends Scraper {
                 }
                 String attributeValues = item.select(".attribute-values").text().trim();
                 if (!attributeName.isBlank()) {
-                    offer.put(attributeName, Arrays.stream(attributeValues.split(","))
+                    offer.put(attributeName, Arrays.stream(attributeValues.split(", "))
                             .map(String::trim)
                             .map(this::sanitize)
                             .filter(Strings::isNotEmpty)

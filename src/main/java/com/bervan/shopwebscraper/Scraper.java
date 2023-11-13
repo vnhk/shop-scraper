@@ -88,7 +88,7 @@ public abstract class Scraper {
                 List<Offer> productOffers = new ArrayList<>();
 
                 String url = baseUrl + product.getUrl();
-                driver.get(getFirstPageUrlWithParams(url));
+                goToPage(driver, url);
                 int pages = getNumberOfPages(driver);
                 processPages(driver, pages, productOffers, url);
 
@@ -115,6 +115,10 @@ public abstract class Scraper {
         });
     }
 
+    protected void goToPage(WebDriver driver, String url) {
+        driver.get(getFirstPageUrlWithParams(url));
+    }
+
     protected abstract String getFirstPageUrlWithParams(String url);
 
     protected abstract int getNumberOfPages(WebDriver driver);
@@ -131,7 +135,7 @@ public abstract class Scraper {
         for (int currentPage = 2; currentPage <= pages; currentPage++) {
             String processedUrl = getUrlWithParametersForPage(url, currentPage);
             System.out.println("Current url: " + processedUrl);
-            driver.get(processedUrl);
+            goToPage(driver, processedUrl);
             loadPageAndProcess(driver, productOffers);
         }
     }
