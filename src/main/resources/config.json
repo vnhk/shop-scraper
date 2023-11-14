@@ -4,11 +4,34 @@
     "baseUrl": "https://www.euro.com.pl",
     "products": [
       {
+        "name": "Nintendo Switch - Gry",
+        "categories": [
+          "Gry",
+          "Nintendo",
+          "Nintendo Switch"
+        ],
+        "url": "/gry-nintendo-switch.bhtml"
+      },
+      {
         "name": "Smartfony",
         "categories": [
           "Smartfony"
         ],
         "url": "/telefony-komorkowe.bhtml"
+      },
+      {
+        "name": "Smartwatche",
+        "categories": [
+          "Smartwatche"
+        ],
+        "url": "/smartwatch.bhtml"
+      },
+      {
+        "name": "Telewizory",
+        "categories": [
+          "Telewizory"
+        ],
+        "url": "/telewizory-led-lcd-plazmowe.bhtml"
       }
     ]
   },

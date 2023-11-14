@@ -22,6 +22,11 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
+    protected int getNThreadsForConcurrentProcessing() {
+        return 5;
+    }
+
+    @Override
     protected String getFirstPageUrlWithParams(String url) {
         return url + "?limit=50";
     }

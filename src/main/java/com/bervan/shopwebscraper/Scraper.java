@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
-    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private ExecutorService executor;
     private final JsonService jsonService;
     private final ExcelService excelService;
     private final StatServerService statServerService;
@@ -30,6 +30,7 @@ public abstract class Scraper {
     }
 
     public void run(ConfigRoot config, Date scrapDate) {
+        executor = Executors.newFixedThreadPool(getNThreadsForConcurrentProcessing());
         List<Offer> offers = new ArrayList<>();
         options();
 
@@ -46,6 +47,8 @@ public abstract class Scraper {
         System.out.printf("Processed %d offers.\n", offers.size());
         saveToFile(config, offers);
     }
+
+    protected abstract int getNThreadsForConcurrentProcessing();
 
     protected void options() {
         options.addArguments("--blink-settings=imagesEnabled=false");
@@ -68,10 +71,10 @@ public abstract class Scraper {
         return "products_shop_scrap_" + shopName + "-";
     }
 
-    private void waitForOffers(List<Offer> mediaExpertOffers, List<Future<List<Offer>>> tasks) {
+    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks) {
         for (Future<List<Offer>> task : tasks) {
             try {
-                mediaExpertOffers.addAll(task.get(30, TimeUnit.MINUTES));
+                offers.addAll(task.get(30, TimeUnit.MINUTES));
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new RuntimeException(e);
             }
@@ -106,6 +109,7 @@ public abstract class Scraper {
                 return productOffers;
             } catch (Exception e) {
                 System.err.println("Could not parse product " + product.getName() + "!");
+                Thread.currentThread().interrupt();
                 throw new RuntimeException("Could not parse product " + product.getName() + "!");
             } finally {
                 driver.quit();

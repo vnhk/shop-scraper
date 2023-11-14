@@ -25,6 +25,11 @@ public class MediaMarktScraper extends Scraper {
         System.err.println("Not supported... yet....");
     }
 
+    @Override
+    protected int getNThreadsForConcurrentProcessing() {
+        return 1;
+    }
+
     public MediaMarktScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
         super(jsonService, excelService, statServerService);
     }

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class ScrapProcessor {
@@ -20,6 +22,7 @@ public class ScrapProcessor {
     public void run() {
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig("/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json");
+        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
         for (ConfigRoot root : roots) {
             String shopName = root.getShopName();
             Scraper scraper = scrapers.get(shopName);
@@ -28,7 +31,7 @@ public class ScrapProcessor {
             }
 
             //threads
-            scraper.run(root, now);
+            executor.submit(() -> scraper.run(root, now));
         }
     }
 

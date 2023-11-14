@@ -25,9 +25,20 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
+    protected int getNThreadsForConcurrentProcessing() {
+        //no concurrent processing
+        return 1;
+    }
+
+    @Override
     protected String getFirstPageUrlWithParams(String url) {
         return url;
     }
+
+//    @Override
+//    protected void options() {
+////        options.addArguments("--blink-settings=imagesEnabled=false");
+//    }
 
     @Override
     protected int getNumberOfPages(WebDriver driver) {
@@ -62,7 +73,7 @@ public class RTVEuroAGDScraper extends Scraper {
         //page can be not loaded yet, try wait 15s to load content
         //or it is the last page
         //to refactor
-        while (offers.size() < Integer.parseInt(PAGE_SIZE) || tries < 15) {
+        while (offers.size() < Integer.parseInt(PAGE_SIZE) && tries < 15) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
