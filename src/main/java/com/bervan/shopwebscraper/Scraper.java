@@ -43,7 +43,7 @@ public abstract class Scraper {
             tasks.add(offerTasks);
         }
 
-        waitForOffers(offers, tasks);
+        waitForOffers(offers, tasks, config.getShopName());
 
         System.out.printf("Processed %d offers.\n", offers.size());
         saveToFile(config, offers);
@@ -72,10 +72,14 @@ public abstract class Scraper {
         return "products_shop_scrap_" + shopName + "-";
     }
 
-    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks) {
+    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks, String shopName) {
+        int i = 1;
+        System.out.println(shopName + " Tasks: " + tasks.size());
         for (Future<List<Offer>> task : tasks) {
             try {
-                offers.addAll(task.get(30, TimeUnit.MINUTES));
+                offers.addAll(task.get(5, TimeUnit.MINUTES));
+                System.out.println(shopName + " Task " + i + " finished!");
+                i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new RuntimeException(e);
             }
@@ -114,9 +118,9 @@ public abstract class Scraper {
 
                 return productOffers;
             } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println("Could not parse product " + product.getName() + "!");
                 driver.quit();
-                Thread.currentThread().interrupt();
                 throw new RuntimeException("Could not parse product " + product.getName() + "!");
             }
         });

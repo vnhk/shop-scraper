@@ -5,11 +5,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ScrapProcessor {
@@ -20,9 +23,11 @@ public class ScrapProcessor {
     }
 
     public void run() {
+        List<Future> tasks = new ArrayList<>();
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig("/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json");
         ExecutorService executor = Executors.newFixedThreadPool(roots.size());
+//        ExecutorService executor = Executors.newFixedThreadPool(1);//for tests
         for (ConfigRoot root : roots) {
             String shopName = root.getShopName();
             Scraper scraper = scrapers.get(shopName);
@@ -31,7 +36,15 @@ public class ScrapProcessor {
             }
 
             //threads
-            executor.submit(() -> scraper.run(root, now));
+            tasks.add(executor.submit(() -> scraper.run(root, now)));
+        }
+
+        for (Future task : tasks) {
+            try {
+                task.get(120, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

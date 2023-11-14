@@ -106,12 +106,14 @@ public class RTVEuroAGDScraper extends Scraper {
             for (Element item : items) {
                 String attributeName = sanitize(item.select("span").get(0).text()
                         .trim());
+                String parsedAttributeName = attributeName;
                 if (attributeName.endsWith(":")) {
-                    attributeName = attributeName.substring(0, attributeName.length() - 1);
+                    parsedAttributeName = attributeName.substring(0, attributeName.length() - 1);
                 }
-                String attributeValues = item.select("span").get(1).text().trim();
-                if (!attributeName.isBlank()) {
-                    offer.put(attributeName, Arrays.stream(attributeValues.split(", "))
+                String attributeValues = item.select("span").text().trim()
+                        .substring(attributeName.length());
+                if (!parsedAttributeName.isBlank()) {
+                    offer.put(parsedAttributeName, Arrays.stream(attributeValues.split(", "))
                             .map(String::trim)
                             .map(this::sanitize)
                             .filter(Strings::isNotEmpty)
