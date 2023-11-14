@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -22,21 +19,25 @@ public class ScrapProcessor {
         this.scrapers = scrapers;
     }
 
-    public void run() {
+    public void run(boolean scrapInMultiMode, String configFilePath, String... shops) {
         List<Future> tasks = new ArrayList<>();
         Date now = new Date();
-        List<ConfigRoot> roots = loadProductsFromConfig("/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json");
+        List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
         ExecutorService executor = Executors.newFixedThreadPool(roots.size());
-//        ExecutorService executor = Executors.newFixedThreadPool(1);//for tests
+        if (!scrapInMultiMode) {
+            executor = Executors.newFixedThreadPool(1);
+        }
+
         for (ConfigRoot root : roots) {
             String shopName = root.getShopName();
-            Scraper scraper = scrapers.get(shopName);
-            if (scraper == null) {
-                throw new RuntimeException("Scraper not found for given shop: " + shopName);
+            if (Arrays.asList(shops).contains(shopName)) {
+                Scraper scraper = scrapers.get(shopName);
+                if (scraper == null) {
+                    throw new RuntimeException("Scraper not found for given shop: " + shopName);
+                }
+                //threads
+                tasks.add(executor.submit(() -> scraper.run(root, now)));
             }
-
-            //threads
-            tasks.add(executor.submit(() -> scraper.run(root, now)));
         }
 
         for (Future task : tasks) {

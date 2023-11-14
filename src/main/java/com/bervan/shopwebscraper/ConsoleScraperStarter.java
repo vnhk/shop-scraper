@@ -18,6 +18,20 @@ public class ConsoleScraperStarter {
         scrapers.put("Media Expert", new MediaExpertScraper(service, excelService, statServerService));
         scrapers.put("RTV Euro AGD", new RTVEuroAGDScraper(service, excelService, statServerService));
         ScrapProcessor scraper = new ScrapProcessor(scrapers);
-        scraper.run();
+//        scrapAll(scraper);
+        scrapOnlyRTV(scraper);
+//        scrapOnlyMediaExpert(scraper);
+    }
+
+    private static void scrapAll(ScrapProcessor scraper) {
+        scraper.run(true, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "Media Expert", "RTV Euro AGD");
+    }
+
+    private static void scrapOnlyRTV(ScrapProcessor scraper) {
+        scraper.run(false, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "RTV Euro AGD");
+    }
+
+    private static void scrapOnlyMediaExpert(ScrapProcessor scraper) {
+        scraper.run(false, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "Media Expert");
     }
 }
