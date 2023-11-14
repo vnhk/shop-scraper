@@ -1,6 +1,7 @@
 package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.save.JsonService;
+import com.bervan.shopwebscraper.save.SavingOffersToDBException;
 import com.bervan.shopwebscraper.save.StatServerService;
 
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ public class ConsoleJsonLoaderStarter {
             }
         }
 
-        statServerService.save(load);
+        try {
+            statServerService.save(load);
+        } catch (SavingOffersToDBException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }

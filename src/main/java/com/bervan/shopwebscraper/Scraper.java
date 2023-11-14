@@ -2,6 +2,7 @@ package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
+import com.bervan.shopwebscraper.save.SavingOffersToDBException;
 import com.bervan.shopwebscraper.save.StatServerService;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -103,16 +104,20 @@ public abstract class Scraper {
                     offer.put("Product List Url", product.getUrl());
                     offer.put("Shop", config.getShopName());
                 }
+                driver.quit();
 
-                statServerService.save(productOffers);
+                try {
+                    statServerService.save(productOffers);
+                } catch (SavingOffersToDBException e) {
+                    System.err.println(e.getMessage());
+                }
 
                 return productOffers;
             } catch (Exception e) {
                 System.err.println("Could not parse product " + product.getName() + "!");
+                driver.quit();
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Could not parse product " + product.getName() + "!");
-            } finally {
-                driver.quit();
             }
         });
     }
