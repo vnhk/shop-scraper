@@ -11,10 +11,10 @@ import java.util.Map;
 
 @Service
 public class StatServerService {
-    @Value("${STAT_SERVER_HOST}")
+    @Value("${stat-server.host}")
     private final String STAT_SERVER_HOST = "http://localhost";
 
-    @Value("${STAT_SERVER_PORT}")
+    @Value("${stat-server.port}")
     private final String STAT_SERVER_PORT = "8080";
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -27,10 +27,10 @@ public class StatServerService {
             for (List<Offer> offerList : partition) {
                 Map result = restTemplate.postForObject(
                         STAT_SERVER_HOST + ":" + STAT_SERVER_PORT + "/products", offerList, Map.class);
-                System.out.printf("Saved part (%d/%d) of data (%s products) to the database.\n",
-                        i,
-                        partition.size(),
-                        result.get("savedProducts"));
+//                System.out.printf("Saved part (%d/%d) of data (%s products) to the database.\n",
+//                        i,
+//                        partition.size(),
+//                        result.get("savedProducts"));
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
                     System.out.println("Not all products have been saved due to the following reasons:");
