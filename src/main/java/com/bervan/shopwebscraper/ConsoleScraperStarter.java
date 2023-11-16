@@ -18,8 +18,8 @@ public class ConsoleScraperStarter {
         scrapers.put("Media Expert", new MediaExpertScraper(service, excelService, statServerService));
         scrapers.put("RTV Euro AGD", new RTVEuroAGDScraper(service, excelService, statServerService));
         ScrapProcessor scraper = new ScrapProcessor(scrapers);
-//        scrapAll(scraper);
-        scrapOnlyRTV(scraper);
+        scrapAll(scraper);
+//        scrapOnlyRTV(scraper);
 //        scrapOnlyMediaExpert(scraper);
     }
 
