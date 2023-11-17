@@ -2,7 +2,9 @@ package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
 import com.google.common.collect.Lists;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,12 +14,18 @@ import java.util.Map;
 @Service
 public class StatServerService {
     @Value("${stat-server.host}")
-    private final String STAT_SERVER_HOST = "http://localhost";
+    private String STAT_SERVER_HOST;
 
     @Value("${stat-server.port}")
-    private final String STAT_SERVER_PORT = "8080";
+    private String STAT_SERVER_PORT;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
+
+    @PostConstruct
+    public void config() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        restTemplate = new RestTemplate(factory);
+    }
 
     public void save(List<Offer> offers) throws SavingOffersToDBException {
         System.out.println("Saving to the database...");
