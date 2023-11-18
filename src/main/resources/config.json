@@ -1,5 +1,208 @@
 [
   {
+    "shopName": "Morele",
+    "baseUrl": "https://www.morele.net",
+    "products": [
+      {
+        "name": "Nintendo Switch - Gry",
+        "categories": [
+          "Gry",
+          "Nintendo",
+          "Nintendo Switch"
+        ],
+        "url": "/kategoria/gry-na-nintendo-2986"
+      },
+      {
+        "name": "Głośniki Bluetooth",
+        "categories": [
+          "Głośniki",
+          "Głośniki Bluetooth",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/glosniki-bluetooth-677"
+      },
+      {
+        "name": "Monitory",
+        "categories": [
+          "Monitory",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/monitory-523"
+      },
+      {
+        "name": "Klawiatury",
+        "categories": [
+          "Klawiatury",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/klawiatury-18"
+      },
+      {
+        "name": "Odkurzacze pionowe",
+        "categories": [
+          "Sprzątanie",
+          "AGD",
+          "Odkurzacze",
+          "Odkurzacze pionowe"
+        ],
+        "url": "/kategoria/odkurzacze-pionowe-610"
+      },
+      {
+        "name": "Myszki",
+        "categories": [
+          "Myszki"
+        ],
+        "url": "/kategoria/myszki-464"
+      },
+      {
+        "name": "Słuchawki",
+        "categories": [
+          "Słuchawki",
+          "Słuchawki z mikrofonem",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/sluchawki-z-mikrofonem-728"
+      },
+      {
+        "name": "Słuchawki Gamingowe",
+        "categories": [
+          "Słuchawki",
+          "Słuchawki Gamingowe",
+          "Słuchawki z mikrofonem",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/sluchawki-gamingowe-466"
+      },
+      {
+        "name": "Smartwatche",
+        "categories": [
+          "Smartwatche"
+        ],
+        "url": "/kategoria/smartwatche-732"
+      },
+      {
+        "name": "Smartfony",
+        "categories": [
+          "Smartfony"
+        ],
+        "url": "/kategoria/smartfony-280"
+      },
+      {
+        "name": "Playstation 5 - Gry",
+        "categories": [
+          "Gry",
+          "Sony",
+          "Playstation",
+          "Playstation 5"
+        ],
+        "url": "/kategoria/gry-na-playstation-729/,,,,,,,,0,,,,49513O1750569"
+      },
+      {
+        "name": "Głośniki komputerowe",
+        "categories": [
+          "Głośniki",
+          "Głośniki komputerowe",
+          "Akcesoria komputerowe"
+        ],
+        "url": "/kategoria/glosniki-komputerowe-6"
+      },
+      {
+        "name": "Karty Graficzne",
+        "categories": [
+          "Karty graficzne",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/kategoria/karty-graficzne-12"
+      },
+      {
+        "name": "Procesory",
+        "categories": [
+          "Procesory",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/kategoria/procesory-45"
+      },
+      {
+        "name": "Pamięć RAM",
+        "categories": [
+          "Pamięć RAM",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/kategoria/pamieci-ram-38"
+      },
+      {
+        "name": "Płyty Główne",
+        "categories": [
+          "Płyty główne",
+          "Podzespoły komputerowe"
+        ],
+        "url": "/kategoria/plyty-glowne-42"
+      },
+      {
+        "name": "Dyski Wewnętrzne SSD",
+        "categories": [
+          "Podzespoły komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski Wewnętrzne",
+          "Dyski SSD"
+        ],
+        "url": "/kategoria/dyski-ssd-518"
+      },
+      {
+        "name": "Tablety",
+        "categories": [
+          "Tablety"
+        ],
+        "url": "/kategoria/tablety-528"
+      },
+      {
+        "name": "Czytniki e-booków",
+        "categories": [
+          "Czytniki e-book"
+        ],
+        "url": "/kategoria/czytniki-e-book-542"
+      },
+      {
+        "name": "Dyski Zewnętrzne SSD",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski SSD",
+          "Dyski zewnętrzne"
+        ],
+        "url": "/kategoria/dyski-zewnetrzne-ssd-207"
+      },
+      {
+        "name": "Dyski Zewnętrzne HDD",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Dyski HDD",
+          "Dyski zewnętrzne"
+        ],
+        "url": "/kategoria/dyski-zewnetrzne-hdd-12449"
+      },
+      {
+        "name": "Pendrive",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Pendrive"
+        ],
+        "url": "/kategoria/pendrive-8"
+      },
+      {
+        "name": "Karty pamięci",
+        "categories": [
+          "Akcesoria komputerowe",
+          "Dyski i nośniki danych",
+          "Karty pamięci"
+        ],
+        "url": "/kategoria/karty-pamieci-626"
+      }
+    ]
+  },
+  {
     "shopName": "RTV Euro AGD",
     "baseUrl": "https://www.euro.com.pl",
     "products": [
