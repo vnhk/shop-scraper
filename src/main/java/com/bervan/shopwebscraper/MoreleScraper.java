@@ -91,11 +91,13 @@ public class MoreleScraper extends Scraper {
 
     @Override
     protected String getOfferPrice(Element offer) {
-        return offer.select(".price-new")
+        String price = offer.select(".price-new")
                 .text()
                 .split("zł")[0]
                 .split(",")[0]
                 .trim();
+        return price.replaceAll("od", "")
+                .replaceAll(" ", "");
     }
 
     @Override
@@ -105,6 +107,6 @@ public class MoreleScraper extends Scraper {
 
     @Override
     protected String getOfferName(Element offer) {
-        return getFirstIfFoundTextByCssQuery(offer, "a.productLink");
+        return getFirstIfFoundAttrByCssQuery(offer, "a.productLink", "title").trim();
     }
 }

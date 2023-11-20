@@ -13,13 +13,13 @@ import java.util.Map;
 
 @Service
 public class StatServerService {
-    @Value("${stat-server.host}")
-    private String STAT_SERVER_HOST;
+    @Value("${stat-server.host:http://localhost}")
+    private String STAT_SERVER_HOST = "http://localhost";
 
-    @Value("${stat-server.port}")
-    private String STAT_SERVER_PORT;
+    @Value("${stat-server.port:8080}")
+    private String STAT_SERVER_PORT = "8080";
 
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate = new RestTemplate();
 
     @PostConstruct
     public void config() {
