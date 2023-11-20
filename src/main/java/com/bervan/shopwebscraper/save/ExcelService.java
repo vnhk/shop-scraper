@@ -17,7 +17,6 @@ import java.util.*;
 public class ExcelService {
     public void save(List<Offer> offers, String filenamePrefix) {
         String filename = FileUtil.getFileName(filenamePrefix, ".xlsx");
-        System.out.println("Saving " + filename + "...");
 
         Set<String> resultExcelColumns = new LinkedHashSet<>();
         for (Offer offer : offers) {
@@ -65,7 +64,6 @@ public class ExcelService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Saved " + filename + ".");
     }
 
     private static String buildStringCollectionText(List<?> obj) {

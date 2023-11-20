@@ -4,6 +4,7 @@ import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
 import com.bervan.shopwebscraper.save.StatServerService;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.*;
 
+@Slf4j
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
     private ExecutorService executor;
@@ -35,18 +37,24 @@ public abstract class Scraper {
         List<Offer> offers = new ArrayList<>();
         options();
 
-        String baseUrl = config.getBaseUrl();
-
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
-            Future<List<Offer>> offerTasks = processProduct(scrapDate, config, baseUrl, product);
+            ScrapContext context = new ScrapContext();
+            context.setRoot(config);
+            context.setProduct(product);
+            context.setScrapDate(scrapDate);
+            Future<List<Offer>> offerTasks = processProduct(context);
             tasks.add(offerTasks);
         }
 
-        waitForOffers(offers, tasks, config.getShopName());
+        ScrapContext context = new ScrapContext();
+        context.setRoot(config);
+        context.setScrapDate(scrapDate);
+        context.setThread(Thread.currentThread().getName());
+        waitForOffers(offers, tasks, context);
 
-        System.out.printf("Processed %d offers.\n", offers.size());
-        saveToFile(config, offers);
+        LogUtils.info(log, context, "Processed {} offers.", offers.size());
+        saveToFile(config, offers, context);
     }
 
     protected abstract int getNThreadsForConcurrentProcessing();
@@ -55,14 +63,15 @@ public abstract class Scraper {
         options.addArguments("--blink-settings=imagesEnabled=false");
     }
 
-    private void saveToFile(ConfigRoot config, List<Offer> offers) {
+    private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
         try {
             String filenamePrefix = getFilenamePrefix(config);
+            LogUtils.info(log, context, "Saving to files...");
             jsonService.save(offers, filenamePrefix);
             excelService.save(offers, filenamePrefix);
+            LogUtils.info(log, context, "Saved to files...");
         } catch (Exception e) {
-            System.err.println("Could not save to file!");
-            e.printStackTrace();
+            LogUtils.error(log, context, "Could not save to file!", e);
         }
     }
 
@@ -72,13 +81,14 @@ public abstract class Scraper {
         return "products_shop_scrap_" + shopName + "-";
     }
 
-    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks, String shopName) {
+    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks, ScrapContext context) {
         int i = 1;
-        System.out.println(shopName + " Tasks: " + tasks.size());
+        LogUtils.info(log, context, "Tasks: {}", tasks.size());
+
         for (Future<List<Offer>> task : tasks) {
             try {
                 offers.addAll(task.get(5, TimeUnit.MINUTES));
-                System.out.println(shopName + " Task " + i + " finished!");
+                LogUtils.info(log, context, "Task {} finished!", i);
                 i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new RuntimeException(e);
@@ -86,99 +96,103 @@ public abstract class Scraper {
         }
     }
 
-    private Future<List<Offer>> processProduct(Date now, ConfigRoot config, String baseUrl, ConfigProduct product) {
+    private Future<List<Offer>> processProduct(ScrapContext context) {
+        String baseUrl = context.getRoot().getBaseUrl();
         return executor.submit(() -> {
+            String threadName = Thread.currentThread().getName();
+            context.setThread(threadName);
             WebDriver driver = new ChromeDriver(options);
             try {
-                System.out.println(" - " + product.getName());
+                LogUtils.info(log, context, "Started processing products.");
                 List<Offer> productOffers = new ArrayList<>();
 
-                String url = baseUrl + product.getUrl();
-                goToPage(driver, url);
-                int pages = getNumberOfPages(driver);
-                processPages(driver, pages, productOffers, url);
+                String url = baseUrl + context.getProduct().getUrl();
+                goToPage(driver, url, context);
+                int pages = getNumberOfPages(driver, context);
+                processPages(driver, pages, productOffers, url, context);
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                String formattedDate = simpleDateFormat.format(now);
+                String formattedDate = simpleDateFormat.format(context.getScrapDate());
                 for (Offer offer : productOffers) {
-                    offer.put("Date", now.getTime());
+                    offer.put("Date", context.getScrapDate().getTime());
                     offer.put("Formatted Date", formattedDate);
-                    offer.put("Product List Name", product.getName());
-                    offer.put("Categories", product.getCategories());
-                    offer.put("Product List Url", product.getUrl());
-                    offer.put("Shop", config.getShopName());
+                    offer.put("Product List Name", context.getProduct().getName());
+                    offer.put("Categories", context.getProduct().getCategories());
+                    offer.put("Product List Url", context.getProduct().getUrl());
+                    offer.put("Shop", context.getRoot().getShopName());
                 }
                 driver.quit();
 
                 try {
+                    LogUtils.info(log, context, "Saving to database...");
                     statServerService.save(productOffers);
+                    LogUtils.info(log, context, "Saved to database...");
                 } catch (SavingOffersToDBException e) {
-                    System.err.println(e.getMessage());
+                    LogUtils.error(log, context, "Could not save to database:", e);
                 }
 
                 return productOffers;
             } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Could not parse product " + product.getName() + "!");
+                LogUtils.error(log, context, "Could not parse products:", e);
                 driver.quit();
-                throw new RuntimeException("Could not parse product " + product.getName() + "!");
+                throw new RuntimeException("Could not parse products " + context.getProduct().getName() + "!");
             }
         });
     }
 
-    protected void goToPage(WebDriver driver, String url) {
-        driver.get(getFirstPageUrlWithParams(url));
+    protected void goToPage(WebDriver driver, String url, ScrapContext context) {
+        driver.get(getFirstPageUrlWithParams(url, context));
     }
 
-    protected abstract String getFirstPageUrlWithParams(String url);
+    protected abstract String getFirstPageUrlWithParams(String url, ScrapContext context);
 
-    protected abstract int getNumberOfPages(WebDriver driver);
+    protected abstract int getNumberOfPages(WebDriver driver, ScrapContext context);
 
-    protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers) {
-        List<Element> offerElements = loadAllOffersTiles(driver);
-        parseOffers(offerElements, productOffers);
+    protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers, ScrapContext context) {
+        List<Element> offerElements = loadAllOffersTiles(driver, context);
+        parseOffers(offerElements, productOffers, context);
     }
 
-    protected void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url) {
-        loadPageAndProcess(driver, productOffers);
+    protected void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url, ScrapContext context) {
+        loadPageAndProcess(driver, productOffers, context);
 
         for (int currentPage = 2; currentPage <= pages; currentPage++) {
-            String processedUrl = getUrlWithParametersForPage(url, currentPage);
-            System.out.println("Current url: " + processedUrl);
-            goToPage(driver, processedUrl);
-            loadPageAndProcess(driver, productOffers);
+            String processedUrl = getUrlWithParametersForPage(url, currentPage, context);
+            LogUtils.debug(log, context, "Current Url: {}", processedUrl);
+            goToPage(driver, processedUrl, context);
+            loadPageAndProcess(driver, productOffers, context);
         }
     }
 
 
-    protected abstract String getUrlWithParametersForPage(String url, int currentPage);
+    protected abstract String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context);
 
-    protected abstract List<Element> loadAllOffersTiles(WebDriver driver);
+    protected abstract List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context);
 
-    protected void parseOffers(List<Element> offerElements, List<Offer> productOffers) {
+    protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         for (Element offerElement : offerElements) {
-            String offerName = sanitize(getOfferName(offerElement));
-            String href = sanitize(getOfferHref(offerElement));
-            String offerPrice = sanitize(getOfferPrice(offerElement));
+            String offerName = sanitize(getOfferName(offerElement, context));
+            String href = sanitize(getOfferHref(offerElement, context));
+            String offerPrice = sanitize(getOfferPrice(offerElement, context));
 
             Offer offer = new Offer();
             offer.put("Name", offerName);
             offer.put("Price", offerPrice);
             offer.put("Offer Url", href);
 
-            processProductAdditionalAttributes(offerElement, offer);
+            processProductAdditionalAttributes(offerElement, offer, context);
 
             productOffers.add(offer);
         }
     }
 
-    protected abstract void processProductAdditionalAttributes(Element offerElement, Offer offer);
+    protected abstract void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context);
 
-    protected abstract String getOfferPrice(Element offer);
+    protected abstract String getOfferPrice(Element offer, ScrapContext context);
 
-    protected abstract String getOfferHref(Element offer);
+    protected abstract String getOfferHref(Element offer, ScrapContext context);
 
-    protected abstract String getOfferName(Element offer);
+    protected abstract String getOfferName(Element offer, ScrapContext context);
 
     protected String sanitize(String text) {
         return text.replace(" ", "")

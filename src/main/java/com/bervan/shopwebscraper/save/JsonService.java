@@ -17,7 +17,6 @@ import java.util.List;
 public class JsonService {
     public void save(List<Offer> offers, String filenamePrefix) {
         String filename = FileUtil.getFileName(filenamePrefix, ".json");
-        System.out.println("Saving " + filename + "...");
         Gson gson = new Gson();
         String json = gson.toJson(offers);
         try (FileOutputStream file = new FileOutputStream(filename)) {
@@ -25,11 +24,9 @@ public class JsonService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Saved " + filename + ".");
     }
 
     public List<Offer> load(String filename) {
-        System.out.println("Loading " + filename + "...");
         List<Offer> offers = new ArrayList<>();
         Gson gson = new Gson();
         try (FileInputStream file = new FileInputStream(filename)) {
@@ -38,7 +35,6 @@ public class JsonService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Loaded " + filename + ".");
         return offers;
     }
 }

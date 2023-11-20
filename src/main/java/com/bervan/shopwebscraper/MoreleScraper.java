@@ -28,12 +28,12 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected String getFirstPageUrlWithParams(String url) {
+    protected String getFirstPageUrlWithParams(String url, ScrapContext context) {
         return url;
     }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver) {
+    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         Elements paginationLastPage = parsed.getElementsByClass("pagination-btn-nolink-anchor");
@@ -52,13 +52,13 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver) {
+    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("cat-product");
     }
 
     @Override
-    protected String getUrlWithParametersForPage(String url, int currentPage) {
+    protected String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context) {
         if (url.contains(",,,,")) {
             return url + "/" + currentPage;
         }
@@ -66,7 +66,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected void processProductAdditionalAttributes(Element offerElement, Offer offer) {
+    protected void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context) {
         Element attributes = offerElement.select(".cat-product-features").first();
         if (attributes != null) {
             List<Element> items = attributes.select(".cat-product-feature");
@@ -90,7 +90,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferPrice(Element offer) {
+    protected String getOfferPrice(Element offer, ScrapContext context) {
         String price = offer.select(".price-new")
                 .text()
                 .split("zł")[0]
@@ -101,12 +101,12 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferHref(Element offer) {
+    protected String getOfferHref(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, "a.productLink", "href");
     }
 
     @Override
-    protected String getOfferName(Element offer) {
+    protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, "a.productLink", "title").trim();
     }
 }

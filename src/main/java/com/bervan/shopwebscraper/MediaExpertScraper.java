@@ -23,16 +23,16 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected int getNThreadsForConcurrentProcessing() {
-        return 5;
+        return 3;
     }
 
     @Override
-    protected String getFirstPageUrlWithParams(String url) {
+    protected String getFirstPageUrlWithParams(String url, ScrapContext context) {
         return url + "?limit=50";
     }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver) {
+    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         String pages = parsed.getElementsByClass("pagination").get(0)
@@ -41,18 +41,18 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver) {
+    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("offer-box");
     }
 
     @Override
-    protected String getUrlWithParametersForPage(String url, int currentPage) {
+    protected String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context) {
         return url + (url.contains("?") ? "&" : "?") + "limit=50&page=" + currentPage;
     }
 
     @Override
-    protected void processProductAdditionalAttributes(Element offerElement, Offer offer) {
+    protected void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context) {
         Element attributes = offerElement.select(".list.attributes").first();
         if (attributes != null) {
             List<Element> items = attributes.select(".item");
@@ -75,17 +75,17 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferPrice(Element offer) {
+    protected String getOfferPrice(Element offer, ScrapContext context) {
         return offer.select(".main-price .whole").text();
     }
 
     @Override
-    protected String getOfferHref(Element offer) {
+    protected String getOfferHref(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, ".name > a", "href");
     }
 
     @Override
-    protected String getOfferName(Element offer) {
+    protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".name > a");
     }
 }

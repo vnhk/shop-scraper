@@ -31,7 +31,7 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
-    protected String getFirstPageUrlWithParams(String url) {
+    protected String getFirstPageUrlWithParams(String url, ScrapContext context) {
         return url;
     }
 
@@ -41,7 +41,7 @@ public class RTVEuroAGDScraper extends Scraper {
 //    }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver) {
+    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         String info = parsed.getElementsByClass("progress-info").get(0).text().trim();
@@ -66,7 +66,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver) {
+    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
         Elements offers = loadOffers(driver);
 
         int tries = 0;
@@ -94,12 +94,12 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
-    protected String getUrlWithParametersForPage(String url, int currentPage) {
+    protected String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context) {
         return url.split("\\.bhtml")[0] + ",strona-" + currentPage + ".bhtml";
     }
 
     @Override
-    protected void processProductAdditionalAttributes(Element offerElement, Offer offer) {
+    protected void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context) {
         Element attributes = offerElement.select(".box-medium__desc").first();
         if (attributes != null) {
             List<Element> items = attributes.select(".box-medium__specs-item");
@@ -124,7 +124,7 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferPrice(Element offer) {
+    protected String getOfferPrice(Element offer, ScrapContext context) {
         return offer.select(".box-medium__price .price-template__large--total")
                 .text()
                 .replace(" ", "")
@@ -132,12 +132,12 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferHref(Element offer) {
+    protected String getOfferHref(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, ".box-medium__link", "href");
     }
 
     @Override
-    protected String getOfferName(Element offer) {
+    protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".box-medium__link");
     }
 }

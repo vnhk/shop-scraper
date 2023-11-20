@@ -42,7 +42,7 @@ public class ScrapProcessor {
 
         for (Future task : tasks) {
             try {
-                task.get(20, TimeUnit.MINUTES);
+                task.get(45, TimeUnit.MINUTES);
             } catch (Exception e) {
                 e.printStackTrace();
             }

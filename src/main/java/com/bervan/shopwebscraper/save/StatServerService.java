@@ -3,6 +3,7 @@ package com.bervan.shopwebscraper.save;
 import com.bervan.shopwebscraper.Offer;
 import com.google.common.collect.Lists;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ public class StatServerService {
     }
 
     public void save(List<Offer> offers) throws SavingOffersToDBException {
-        System.out.println("Saving to the database...");
         try {
             List<List<Offer>> partition = Lists.partition(offers, 300);
             int i = 1;
@@ -51,6 +51,5 @@ public class StatServerService {
         } catch (Exception e) {
             throw new SavingOffersToDBException("Saving to the database failed!", e);
         }
-        System.out.println("Saved to the database.");
     }
 }
