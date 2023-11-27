@@ -91,6 +91,7 @@ public abstract class Scraper {
                 LogUtils.info(log, context, "Task {} finished!", i);
                 i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                task.cancel(true);
                 throw new RuntimeException(e);
             }
         }
