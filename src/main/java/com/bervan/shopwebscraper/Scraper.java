@@ -87,7 +87,7 @@ public abstract class Scraper {
 
         for (Future<List<Offer>> task : tasks) {
             try {
-                offers.addAll(task.get(5, TimeUnit.MINUTES));
+                offers.addAll(task.get(30, TimeUnit.MINUTES));
                 LogUtils.info(log, context, "Task {} finished!", i);
                 i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
