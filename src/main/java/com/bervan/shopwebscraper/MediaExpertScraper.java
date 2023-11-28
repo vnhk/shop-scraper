@@ -23,7 +23,7 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected int getNThreadsForConcurrentProcessing() {
-        return 3;
+        return 5;
     }
 
     @Override

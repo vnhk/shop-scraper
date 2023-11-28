@@ -4,6 +4,10 @@ import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
 import com.bervan.shopwebscraper.save.StatServerService;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -37,6 +41,8 @@ public abstract class Scraper {
         List<Offer> offers = new ArrayList<>();
         options();
 
+        waitAndRunBrowserToPreventExceptionOnStart(config);
+
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
             ScrapContext context = new ScrapContext();
@@ -55,6 +61,22 @@ public abstract class Scraper {
 
         LogUtils.info(log, context, "Processed {} offers.", offers.size());
         saveToFile(config, offers, context);
+    }
+
+    private void waitAndRunBrowserToPreventExceptionOnStart(ConfigRoot config) {
+        try {
+            WebDriver driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+            driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+            driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+        } catch (Exception e) {
+            log.error("waitAndRunBrowserToPreventExceptionOnStart:", e);
+        }
     }
 
     protected abstract int getNThreadsForConcurrentProcessing();
@@ -99,45 +121,55 @@ public abstract class Scraper {
 
     private Future<List<Offer>> processProduct(ScrapContext context) {
         String baseUrl = context.getRoot().getBaseUrl();
+        Retryer<List<Offer>> retryer = RetryerBuilder.<List<Offer>>newBuilder()
+                .retryIfExceptionOfType(ProductScrapException.class)
+                .retryIfRuntimeException()
+                .withWaitStrategy(WaitStrategies.fixedWait(10, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
+
         return executor.submit(() -> {
-            String threadName = Thread.currentThread().getName();
-            context.setThread(threadName);
-            WebDriver driver = new ChromeDriver(options);
-            try {
-                LogUtils.info(log, context, "Started processing products.");
-                List<Offer> productOffers = new ArrayList<>();
-
-                String url = baseUrl + context.getProduct().getUrl();
-                goToPage(driver, url, context);
-                int pages = getNumberOfPages(driver, context);
-                processPages(driver, pages, productOffers, url, context);
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                String formattedDate = simpleDateFormat.format(context.getScrapDate());
-                for (Offer offer : productOffers) {
-                    offer.put("Date", context.getScrapDate().getTime());
-                    offer.put("Formatted Date", formattedDate);
-                    offer.put("Product List Name", context.getProduct().getName());
-                    offer.put("Categories", context.getProduct().getCategories());
-                    offer.put("Product List Url", context.getProduct().getUrl());
-                    offer.put("Shop", context.getRoot().getShopName());
-                }
-                driver.quit();
-
+            Callable<List<Offer>> callable = () -> {
+                String threadName = Thread.currentThread().getName();
+                context.setThread(threadName);
+                WebDriver driver = new ChromeDriver(options);
                 try {
-                    LogUtils.info(log, context, "Saving to database...");
-                    statServerService.save(productOffers);
-                    LogUtils.info(log, context, "Saved to database...");
-                } catch (SavingOffersToDBException e) {
-                    LogUtils.error(log, context, "Could not save to database:", e);
-                }
+                    LogUtils.info(log, context, "Started processing products.");
+                    List<Offer> productOffers = new ArrayList<>();
 
-                return productOffers;
-            } catch (Exception e) {
-                LogUtils.error(log, context, "Could not parse products:", e);
-                driver.quit();
-                throw new RuntimeException("Could not parse products " + context.getProduct().getName() + "!");
-            }
+                    String url = baseUrl + context.getProduct().getUrl();
+                    goToPage(driver, url, context);
+                    int pages = getNumberOfPages(driver, context);
+                    processPages(driver, pages, productOffers, url, context);
+
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                    String formattedDate = simpleDateFormat.format(context.getScrapDate());
+                    for (Offer offer : productOffers) {
+                        offer.put("Date", context.getScrapDate().getTime());
+                        offer.put("Formatted Date", formattedDate);
+                        offer.put("Product List Name", context.getProduct().getName());
+                        offer.put("Categories", context.getProduct().getCategories());
+                        offer.put("Product List Url", context.getProduct().getUrl());
+                        offer.put("Shop", context.getRoot().getShopName());
+                    }
+                    driver.quit();
+
+                    try {
+                        LogUtils.info(log, context, "Saving to database...");
+                        statServerService.save(productOffers);
+                        LogUtils.info(log, context, "Saved to database...");
+                    } catch (SavingOffersToDBException e) {
+                        LogUtils.error(log, context, "Could not save to database:", e);
+                    }
+
+                    return productOffers;
+                } catch (Exception e) {
+                    LogUtils.error(log, context, "Could not parse products:", e);
+                    driver.quit();
+                    throw new ProductScrapException("Could not parse products " + context.getProduct().getName() + "!", context.getProduct());
+                }
+            };
+            return retryer.call(callable);
         });
     }
 
