@@ -1,5 +1,6 @@
 package com.bervan.shopwebscraper.scheduler;
 
+import ch.qos.logback.core.testUtil.RandomUtil;
 import com.bervan.shopwebscraper.ScrapProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,7 +17,8 @@ public class SchedulerTasks {
     }
 
     @Scheduled(cron = "0 0 6 * * *")
-    public void scrapMediaExpert() {
+    public void scrapMediaExpert() throws InterruptedException {
+        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Media Expert Scraping: STARTED!");
         try {
             scrapProcessor.run(true, "config.json", "Media Expert");
@@ -27,7 +29,8 @@ public class SchedulerTasks {
     }
 
     @Scheduled(cron = "0 0 11 * * *")
-    public void scrapMorele() {
+    public void scrapMorele() throws InterruptedException {
+        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Morele Scraping: STARTED!");
         try {
             scrapProcessor.run(true, "config.json", "Morele");
@@ -37,8 +40,9 @@ public class SchedulerTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 15 * * *")
-    public void scrapRTVEuroAGD() {
+    @Scheduled(cron = "0 0 22 * * *")
+    public void scrapRTVEuroAGD() throws InterruptedException {
+        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("RTV Euro AGD Scraping: STARTED!");
         try {
             scrapProcessor.run(true, "config.json", "RTV Euro AGD");
