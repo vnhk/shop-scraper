@@ -1,6 +1,8 @@
 package com.bervan.shopwebscraper;
 
 import com.google.gson.Gson;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
@@ -50,9 +52,10 @@ public class ScrapProcessor {
     }
 
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
+        Resource resource = new ClassPathResource("classpath:" + configFilePath);
         Gson gson = new Gson();
 
-        try (FileReader reader = new FileReader(configFilePath)) {
+        try (FileReader reader = new FileReader(resource.getFile())) {
             return List.of(gson.fromJson(reader, ConfigRoot[].class));
         } catch (IOException e) {
             throw new RuntimeException("Unable to load config!");

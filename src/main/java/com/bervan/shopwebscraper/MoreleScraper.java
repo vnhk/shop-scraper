@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service("Morele")
 public class MoreleScraper extends Scraper {
+    @Value("${MORELE_N_THREADS:1}")
+    private final Integer N_THREADS = 1;
 
     public MoreleScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
         super(jsonService, excelService, statServerService);
@@ -24,7 +27,7 @@ public class MoreleScraper extends Scraper {
 
     @Override
     protected int getNThreadsForConcurrentProcessing() {
-        return 8;
+        return N_THREADS;
     }
 
     @Override

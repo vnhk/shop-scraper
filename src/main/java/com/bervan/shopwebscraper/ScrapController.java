@@ -23,9 +23,7 @@ public class ScrapController {
     @PostMapping("/scrap")
     public ResponseEntity<List<String>> scrap(@RequestParam String shopNames) {
         String[] shops = shopNames.split(",");
-        scrapProcessor.run(true,
-                "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json",
-                shops);
+        scrapProcessor.run(true, "config.json", shops);
 
         return ResponseEntity.of(Optional.of(Arrays.asList("No messages configured yet...")));
     }

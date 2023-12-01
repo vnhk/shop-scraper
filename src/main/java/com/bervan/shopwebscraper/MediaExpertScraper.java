@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,13 +18,16 @@ import java.util.stream.Collectors;
 @Service("Media Expert")
 public class MediaExpertScraper extends Scraper {
 
+    @Value("${MEDIA_EXPERT_N_THREADS:1}")
+    private final Integer N_THREADS = 1;
+
     public MediaExpertScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
         super(jsonService, excelService, statServerService);
     }
 
     @Override
     protected int getNThreadsForConcurrentProcessing() {
-        return 5;
+        return N_THREADS;
     }
 
     @Override

@@ -24,14 +24,14 @@ public class ConsoleScraperStarter {
     }
 
     private static void scrapAll(ScrapProcessor scraper) {
-        scraper.run(true, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "Media Expert", "RTV Euro AGD");
+        scraper.run(true, "config.json", "Media Expert", "RTV Euro AGD");
     }
 
     private static void scrapOnlyRTV(ScrapProcessor scraper) {
-        scraper.run(false, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "RTV Euro AGD");
+        scraper.run(false, "config.json", "RTV Euro AGD");
     }
 
     private static void scrapOnlyMediaExpert(ScrapProcessor scraper) {
-        scraper.run(false, "/Users/zbyszek/IdeaProjects/ShopWebscraper/src/main/resources/config.json", "Media Expert");
+        scraper.run(false, "config.json", "Media Expert");
     }
 }

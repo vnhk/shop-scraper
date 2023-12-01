@@ -26,7 +26,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
     @Override
     protected int getNThreadsForConcurrentProcessing() {
-        //no concurrent processing
+        //concurrent processing for rtv euro agd is not possible
         return 1;
     }
 
