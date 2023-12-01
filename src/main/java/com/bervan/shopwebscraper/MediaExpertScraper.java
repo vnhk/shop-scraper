@@ -85,6 +85,11 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
+        return getFirstIfFoundAttrByCssQuery(offer, "div.product-list-gallery-slider.is-possible-hover > a > div:nth-child(1) > img", "src");
+    }
+
+    @Override
     protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".name > a");
     }

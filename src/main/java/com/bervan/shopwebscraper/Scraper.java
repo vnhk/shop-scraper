@@ -206,12 +206,14 @@ public abstract class Scraper {
         for (Element offerElement : offerElements) {
             String offerName = sanitize(getOfferName(offerElement, context));
             String href = sanitize(getOfferHref(offerElement, context));
+            String imgSrc = sanitize(getOfferImgHref(offerElement, context));
             String offerPrice = sanitize(getOfferPrice(offerElement, context));
 
             Offer offer = new Offer();
             offer.put("Name", offerName);
             offer.put("Price", offerPrice);
             offer.put("Offer Url", href);
+            offer.put("Image", imgSrc);
 
             processProductAdditionalAttributes(offerElement, offer, context);
 
@@ -224,6 +226,8 @@ public abstract class Scraper {
     protected abstract String getOfferPrice(Element offer, ScrapContext context);
 
     protected abstract String getOfferHref(Element offer, ScrapContext context);
+
+    protected abstract String getOfferImgHref(Element offer, ScrapContext context);
 
     protected abstract String getOfferName(Element offer, ScrapContext context);
 

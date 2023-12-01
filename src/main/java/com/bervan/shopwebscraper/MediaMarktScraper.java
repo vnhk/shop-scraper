@@ -114,6 +114,11 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
+        return null;
+    }
+
+    @Override
     protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".name > a");
     }

@@ -137,6 +137,11 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
+        return getFirstIfFoundAttrByCssQuery(offer, "div.box-medium__photo > img", "src");
+    }
+
+    @Override
     protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".box-medium__link");
     }

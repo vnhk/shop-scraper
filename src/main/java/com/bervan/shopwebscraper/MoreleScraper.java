@@ -106,6 +106,11 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
+        return getFirstIfFoundAttrByCssQuery(offer, "div.cat-product-left > a > picture > img", "src");
+    }
+
+    @Override
     protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, "a.productLink", "title").trim();
     }
