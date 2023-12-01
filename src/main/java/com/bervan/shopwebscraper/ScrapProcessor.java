@@ -3,6 +3,7 @@ package com.bervan.shopwebscraper;
 import com.google.gson.Gson;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
@@ -16,9 +17,11 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ScrapProcessor {
     private final Map<String, Scraper> scrapers;
+    private final ResourceLoader resourceLoader;
 
-    public ScrapProcessor(Map<String, Scraper> scrapers) {
+    public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader) {
         this.scrapers = scrapers;
+        this.resourceLoader = resourceLoader;
     }
 
     public void run(boolean scrapInMultiMode, String configFilePath, String... shops) {
@@ -52,7 +55,7 @@ public class ScrapProcessor {
     }
 
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
-        Resource resource = new ClassPathResource("classpath:" + configFilePath);
+        Resource resource = resourceLoader.getResource("classpath:" + configFilePath);
         Gson gson = new Gson();
 
         try (FileReader reader = new FileReader(resource.getFile())) {
