@@ -16,7 +16,7 @@ public class SchedulerTasks {
         this.scrapProcessor = scrapProcessor;
     }
 
-    @Scheduled(cron = "0 0 6 * * *")
+    @Scheduled(cron = "0 0 4 * * *")
     public void scrapMediaExpert() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Media Expert Scraping: STARTED!");
@@ -40,7 +40,7 @@ public class SchedulerTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 22 * * *")
+    @Scheduled(cron = "0 0 17 * * *")
     public void scrapRTVEuroAGD() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("RTV Euro AGD Scraping: STARTED!");
