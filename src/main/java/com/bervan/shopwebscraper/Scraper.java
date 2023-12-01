@@ -89,6 +89,7 @@ public abstract class Scraper {
 
     protected void options() {
 //        options.addArguments("--blink-settings=imagesEnabled=false");
+        options.addArguments("--no-sandbox");
         options.addArguments("--headless");
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
