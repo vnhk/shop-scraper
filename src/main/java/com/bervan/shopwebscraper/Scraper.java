@@ -1,5 +1,6 @@
 package com.bervan.shopwebscraper;
 
+import ch.qos.logback.core.testUtil.RandomUtil;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
@@ -14,6 +15,8 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,12 +26,15 @@ import java.util.Locale;
 import java.util.concurrent.*;
 
 @Slf4j
+@Component
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
     private ExecutorService executor;
     private final JsonService jsonService;
     private final ExcelService excelService;
     private final StatServerService statServerService;
+    @Value("#{'${USER_AGENTS}'.split(',,,,')}")
+    private List<String> userAgents;
 
     public Scraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
         this.jsonService = jsonService;
@@ -65,7 +71,7 @@ public abstract class Scraper {
 
     private void waitAndRunBrowserToPreventExceptionOnStart(ConfigRoot config) {
         try {
-            WebDriver driver = new ChromeDriver(options);
+            ChromeDriver driver = new ChromeDriver(options);
             driver.get(config.getBaseUrl());
             driver.quit();
             driver = new ChromeDriver(options);
@@ -82,7 +88,10 @@ public abstract class Scraper {
     protected abstract int getNThreadsForConcurrentProcessing();
 
     protected void options() {
-        options.addArguments("--blink-settings=imagesEnabled=false");
+//        options.addArguments("--blink-settings=imagesEnabled=false");
+        options.addArguments("--headless");
+        String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
+        options.addArguments("--user-agent=" + userAgent.trim());
     }
 
     private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
