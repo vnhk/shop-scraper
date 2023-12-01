@@ -1,7 +1,6 @@
 package com.bervan.shopwebscraper;
 
 import com.google.gson.Gson;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
