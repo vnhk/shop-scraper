@@ -92,6 +92,9 @@ public abstract class Scraper {
         options.addArguments("--headless");
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--ignore-ssl-errors=yes");
+        options.addArguments("--ignore-certificate-errors");
     }
 
     private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
