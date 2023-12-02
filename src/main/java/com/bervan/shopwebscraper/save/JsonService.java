@@ -1,8 +1,10 @@
 package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -15,7 +17,13 @@ import java.util.List;
 
 @Service
 public class JsonService {
+    @Value("${SAVE_TO_JSON_DIRECTORY:}")
+    private String SAVE_TO_JSON_DIRECTORY;
+
     public void save(List<Offer> offers, String filenamePrefix) {
+        if (!Strings.isNullOrEmpty(SAVE_TO_JSON_DIRECTORY)) {
+            filenamePrefix = SAVE_TO_JSON_DIRECTORY + "/" + filenamePrefix;
+        }
         String filename = FileUtil.getFileName(filenamePrefix, ".json");
         Gson gson = new Gson();
         String json = gson.toJson(offers);

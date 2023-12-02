@@ -1,8 +1,10 @@
 package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
+import com.google.common.base.Strings;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,7 +17,13 @@ import java.util.*;
 
 @Service
 public class ExcelService {
+    @Value("${SAVE_TO_EXCEL_DIRECTORY:}")
+    private String SAVE_TO_EXCEL_DIRECTORY;
+
     public void save(List<Offer> offers, String filenamePrefix) {
+        if (!Strings.isNullOrEmpty(SAVE_TO_EXCEL_DIRECTORY)) {
+            filenamePrefix = SAVE_TO_EXCEL_DIRECTORY  + "/" + filenamePrefix;
+        }
         String filename = FileUtil.getFileName(filenamePrefix, ".xlsx");
 
         Set<String> resultExcelColumns = new LinkedHashSet<>();
