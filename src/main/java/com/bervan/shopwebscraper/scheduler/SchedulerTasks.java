@@ -28,7 +28,7 @@ public class SchedulerTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 11 * * *")
+    @Scheduled(cron = "0 10 11 * * *")
     public void scrapMorele() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Morele Scraping: STARTED!");
