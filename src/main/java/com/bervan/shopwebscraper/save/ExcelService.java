@@ -1,7 +1,7 @@
 package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
-import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +16,23 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ExcelService {
-    @Value("${SAVE_TO_EXCEL_DIRECTORY:}")
-    private String SAVE_TO_EXCEL_DIRECTORY;
+    @Value("#{'${SAVE_TO_EXCEL_DIRECTORIES}'.split(',,,,')}")
+    private List<String> SAVE_TO_EXCEL_DIRECTORIES;
 
     public void save(List<Offer> offers, String filenamePrefix) {
-        if (!Strings.isNullOrEmpty(SAVE_TO_EXCEL_DIRECTORY)) {
-            filenamePrefix = SAVE_TO_EXCEL_DIRECTORY  + "/" + filenamePrefix;
+        if (SAVE_TO_EXCEL_DIRECTORIES != null && SAVE_TO_EXCEL_DIRECTORIES.size() != 0) {
+            for (String saveToExcelDirectory : SAVE_TO_EXCEL_DIRECTORIES) {
+                String filename = saveToExcelDirectory + "/" + filenamePrefix;
+                saveInternal(offers, filename);
+            }
+        } else {
+            saveInternal(offers, filenamePrefix);
         }
+    }
+
+    private void saveInternal(List<Offer> offers, String filenamePrefix) {
         String filename = FileUtil.getFileName(filenamePrefix, ".xlsx");
 
         Set<String> resultExcelColumns = new LinkedHashSet<>();
@@ -70,7 +79,7 @@ public class ExcelService {
                 rowNumber++;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Could not save file!", e);
         }
     }
 
