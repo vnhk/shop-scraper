@@ -8,8 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StatServerService {
@@ -27,29 +26,46 @@ public class StatServerService {
         restTemplate = new RestTemplate(factory);
     }
 
-    public void save(List<Offer> offers) throws SavingOffersToDBException {
+    public Set<String> refreshViews() throws SavingOffersToDBException {
+        Set<String> res = new HashSet<>();
+        try {
+            Map result = restTemplate.postForObject(
+                    getStatServerHost() + ":" + STAT_SERVER_PORT + "/products/refresh-materialized-views",
+                    new HashMap<>(), Map.class);
+            List<String> messages = (List) result.get("messages");
+            if (!messages.isEmpty()) {
+                System.out.println("Views could not be refreshed:");
+                for (String message : messages) {
+                    System.out.println("- " + message);
+                }
+                res.addAll(messages);
+            }
+        } catch (Exception e) {
+            throw new SavingOffersToDBException("Saving to the database failed!", e);
+        }
+        return res;
+    }
+
+    public Set<String> save(List<Offer> offers) throws SavingOffersToDBException {
+        Set<String> res = new HashSet<>();
         try {
             List<List<Offer>> partition = Lists.partition(offers, 300);
-            int i = 1;
             for (List<Offer> offerList : partition) {
                 Map result = restTemplate.postForObject(
                         getStatServerHost() + ":" + STAT_SERVER_PORT + "/products", offerList, Map.class);
-//                System.out.printf("Saved part (%d/%d) of data (%s products) to the database.\n",
-//                        i,
-//                        partition.size(),
-//                        result.get("savedProducts"));
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
                     System.out.println("Not all products have been saved due to the following reasons:");
                     for (String message : messages) {
                         System.out.println("- " + message);
                     }
+                    res.addAll(messages);
                 }
-                i++;
             }
         } catch (Exception e) {
             throw new SavingOffersToDBException("Saving to the database failed!", e);
         }
+        return res;
     }
 
     private String getStatServerHost() {
