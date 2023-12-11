@@ -41,7 +41,7 @@ public class StatServerService {
                 res.addAll(messages);
             }
         } catch (Exception e) {
-            throw new SavingOffersToDBException("Saving to the database failed!", e);
+            throw new SavingOffersToDBException("Views could not be refreshed!", e);
         }
         return res;
     }
