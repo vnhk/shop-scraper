@@ -29,21 +29,26 @@ public class StatServerService {
     public Set<String> refreshViews() throws SavingOffersToDBException {
         Set<String> res = new HashSet<>();
         try {
-            Map result = restTemplate.postForObject(
-                    getStatServerHost() + ":" + STAT_SERVER_PORT + "/products/refresh-materialized-views",
-                    new HashMap<>(), Map.class);
-            List<String> messages = (List) result.get("messages");
-            if (!messages.isEmpty()) {
-                System.out.println("Views could not be refreshed:");
-                for (String message : messages) {
-                    System.out.println("- " + message);
-                }
-                res.addAll(messages);
-            }
+            refresh(res, "/products/refresh-materialized-views");
+            refresh(res, "/favorites/refresh-materialized-views");
         } catch (Exception e) {
             throw new SavingOffersToDBException("Views could not be refreshed!", e);
         }
         return res;
+    }
+
+    private void refresh(Set<String> res, String endpoint) {
+        Map result = restTemplate.postForObject(
+                getStatServerHost() + ":" + STAT_SERVER_PORT + endpoint,
+                new HashMap<>(), Map.class);
+        List<String> messages = (List) result.get("messages");
+        if (!messages.isEmpty()) {
+            System.out.println("Views could not be refreshed:");
+            for (String message : messages) {
+                System.out.println("- " + message);
+            }
+            res.addAll(messages);
+        }
     }
 
     public Set<String> save(List<Offer> offers) throws SavingOffersToDBException {
