@@ -28,7 +28,7 @@ public class SchedulerTasks {
             statServerService.refreshViews();
             log.info("Media Expert Scraping: COMPLETED!");
         } catch (Exception e) {
-            log.error("Media Expert Scraping: FAILED!");
+            log.error("Media Expert Scraping: FAILED!", e);
         }
     }
 
@@ -41,7 +41,7 @@ public class SchedulerTasks {
             statServerService.refreshViews();
             log.info("Morele Scraping: COMPLETED!");
         } catch (Exception e) {
-            log.error("Morele Scraping: FAILED!");
+            log.error("Morele Scraping: FAILED!", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class SchedulerTasks {
             statServerService.refreshViews();
             log.info("RTV Euro AGD Scraping: COMPLETED!");
         } catch (Exception e) {
-            log.error("RTV Euro AGD Scraping: FAILED!");
+            log.error("RTV Euro AGD Scraping: FAILED!", e);
         }
     }
 }
