@@ -16,6 +16,41 @@
         }
       },
       {
+        "name": "Kierownice",
+        "categories": [
+          "Kierownice",
+          "Gaming"
+        ],
+        "url": "/kategoria/kierownice-116",
+        "scrapTime": {
+          "hours": 1
+        }
+      },
+      {
+        "name": "Kawa ziarnista",
+        "categories": [
+          "Kawa",
+          "Kawa ziarnista",
+          "Artykuły spożywcze"
+        ],
+        "url": "/kategoria/kawa-ziarnista-1300",
+        "scrapTime": {
+          "hours": 5
+        }
+      },
+      {
+        "name": "Kawa mielona",
+        "categories": [
+          "Kawa",
+          "Kawa mielona",
+          "Artykuły spożywcze"
+        ],
+        "url": "/kategoria/kawa-mielona-1301",
+        "scrapTime": {
+          "hours": 5
+        }
+      },
+      {
         "name": "Głośniki Bluetooth",
         "categories": [
           "Głośniki",
