@@ -2,9 +2,8 @@ package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
 import com.google.common.collect.Lists;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,13 +17,8 @@ public class StatServerService {
     @Value("${stat-server.port:8080}")
     private String STAT_SERVER_PORT = "8080";
 
-    private RestTemplate restTemplate = new RestTemplate();
-
-    @PostConstruct
-    public void config() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        restTemplate = new RestTemplate(factory);
-    }
+    @Autowired
+    private RestTemplate restTemplate;
 
     public Set<String> refreshViews() throws SavingOffersToDBException {
         Set<String> res = new HashSet<>();
