@@ -11,4 +11,5 @@ public class ConfigProduct {
     private String name;
     private Set<String> categories;
     private String url;
+    private Integer hour;
 }

@@ -10,7 +10,10 @@
           "Nintendo",
           "Nintendo Switch"
         ],
-        "url": "/kategoria/gry-na-nintendo-2986"
+        "url": "/kategoria/gry-na-nintendo-2986",
+        "scrapTime": {
+          "hours": 0
+        }
       },
       {
         "name": "Głośniki Bluetooth",
@@ -19,7 +22,10 @@
           "Głośniki Bluetooth",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/glosniki-bluetooth-677"
+        "url": "/kategoria/glosniki-bluetooth-677",
+        "scrapTime": {
+          "hours": 1
+        }
       },
       {
         "name": "Monitory",
@@ -27,7 +33,10 @@
           "Monitory",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/monitory-523"
+        "url": "/kategoria/monitory-523",
+        "scrapTime": {
+          "hours": 1
+        }
       },
       {
         "name": "Klawiatury",
@@ -35,7 +44,10 @@
           "Klawiatury",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/klawiatury-18"
+        "url": "/kategoria/klawiatury-18",
+        "scrapTime": {
+          "hours": 1
+        }
       },
       {
         "name": "Odkurzacze pionowe",
@@ -45,14 +57,20 @@
           "Odkurzacze",
           "Odkurzacze pionowe"
         ],
-        "url": "/kategoria/odkurzacze-pionowe-610"
+        "url": "/kategoria/odkurzacze-pionowe-610",
+        "scrapTime": {
+          "hours": 1
+        }
       },
       {
         "name": "Myszki",
         "categories": [
           "Myszki"
         ],
-        "url": "/kategoria/myszki-464"
+        "url": "/kategoria/myszki-464",
+        "scrapTime": {
+          "hours": 2
+        }
       },
       {
         "name": "Myszki gamingowe",
@@ -60,7 +78,10 @@
           "Myszki",
           "Myszki Gamingowe"
         ],
-        "url": "/kategoria/myszki-gamingowe-27"
+        "url": "/kategoria/myszki-gamingowe-27",
+        "scrapTime": {
+          "hours": 2
+        }
       },
       {
         "name": "Słuchawki",
@@ -69,7 +90,10 @@
           "Słuchawki z mikrofonem",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/sluchawki-z-mikrofonem-728"
+        "url": "/kategoria/sluchawki-z-mikrofonem-728",
+        "scrapTime": {
+          "hours": 3
+        }
       },
       {
         "name": "Słuchawki Gamingowe",
@@ -79,21 +103,30 @@
           "Słuchawki z mikrofonem",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/sluchawki-gamingowe-466"
+        "url": "/kategoria/sluchawki-gamingowe-466",
+        "scrapTime": {
+          "hours": 3
+        }
       },
       {
         "name": "Smartwatche",
         "categories": [
           "Smartwatche"
         ],
-        "url": "/kategoria/smartwatche-732"
+        "url": "/kategoria/smartwatche-732",
+        "scrapTime": {
+          "hours": 3
+        }
       },
       {
         "name": "Smartfony",
         "categories": [
           "Smartfony"
         ],
-        "url": "/kategoria/smartfony-280"
+        "url": "/kategoria/smartfony-280",
+        "scrapTime": {
+          "hours": 4
+        }
       },
       {
         "name": "Playstation 5 - Gry",
@@ -103,7 +136,10 @@
           "Playstation",
           "Playstation 5"
         ],
-        "url": "/kategoria/gry-na-playstation-729/,,,,,,,,0,,,,49513O1750569"
+        "url": "/kategoria/gry-na-playstation-729/,,,,,,,,0,,,,49513O1750569",
+        "scrapTime": {
+          "hours": 4
+        }
       },
       {
         "name": "Głośniki komputerowe",
@@ -112,7 +148,10 @@
           "Głośniki komputerowe",
           "Akcesoria komputerowe"
         ],
-        "url": "/kategoria/glosniki-komputerowe-6"
+        "url": "/kategoria/glosniki-komputerowe-6",
+        "scrapTime": {
+          "hours": 4
+        }
       },
       {
         "name": "Karty Graficzne",
@@ -120,7 +159,10 @@
           "Karty graficzne",
           "Podzespoły komputerowe"
         ],
-        "url": "/kategoria/karty-graficzne-12"
+        "url": "/kategoria/karty-graficzne-12",
+        "scrapTime": {
+          "hours": 6
+        }
       },
       {
         "name": "Procesory",
@@ -128,7 +170,10 @@
           "Procesory",
           "Podzespoły komputerowe"
         ],
-        "url": "/kategoria/procesory-45"
+        "url": "/kategoria/procesory-45",
+        "scrapTime": {
+          "hours": 6
+        }
       },
       {
         "name": "Pamięć RAM",
@@ -136,7 +181,10 @@
           "Pamięć RAM",
           "Podzespoły komputerowe"
         ],
-        "url": "/kategoria/pamieci-ram-38"
+        "url": "/kategoria/pamieci-ram-38",
+        "scrapTime": {
+          "hours": 6
+        }
       },
       {
         "name": "Płyty Główne",
@@ -144,7 +192,10 @@
           "Płyty główne",
           "Podzespoły komputerowe"
         ],
-        "url": "/kategoria/plyty-glowne-42"
+        "url": "/kategoria/plyty-glowne-42",
+        "scrapTime": {
+          "hours": 6
+        }
       },
       {
         "name": "Dyski Wewnętrzne SSD",
@@ -154,21 +205,30 @@
           "Dyski Wewnętrzne",
           "Dyski SSD"
         ],
-        "url": "/kategoria/dyski-ssd-518"
+        "url": "/kategoria/dyski-ssd-518",
+        "scrapTime": {
+          "hours": 7
+        }
       },
       {
         "name": "Tablety",
         "categories": [
           "Tablety"
         ],
-        "url": "/kategoria/tablety-528"
+        "url": "/kategoria/tablety-528",
+        "scrapTime": {
+          "hours": 7
+        }
       },
       {
         "name": "Czytniki e-booków",
         "categories": [
           "Czytniki e-book"
         ],
-        "url": "/kategoria/czytniki-e-book-542"
+        "url": "/kategoria/czytniki-e-book-542",
+        "scrapTime": {
+          "hours": 7
+        }
       },
       {
         "name": "Dyski Zewnętrzne SSD",
@@ -178,7 +238,10 @@
           "Dyski SSD",
           "Dyski zewnętrzne"
         ],
-        "url": "/kategoria/dyski-zewnetrzne-ssd-207"
+        "url": "/kategoria/dyski-zewnetrzne-ssd-207",
+        "scrapTime": {
+          "hours": 7
+        }
       },
       {
         "name": "Dyski Zewnętrzne HDD",
@@ -188,7 +251,10 @@
           "Dyski HDD",
           "Dyski zewnętrzne"
         ],
-        "url": "/kategoria/dyski-zewnetrzne-hdd-12449"
+        "url": "/kategoria/dyski-zewnetrzne-hdd-12449",
+        "scrapTime": {
+          "hours": 8
+        }
       },
       {
         "name": "Pendrive",
@@ -197,7 +263,10 @@
           "Dyski i nośniki danych",
           "Pendrive"
         ],
-        "url": "/kategoria/pendrive-8"
+        "url": "/kategoria/pendrive-8",
+        "scrapTime": {
+          "hours": 8
+        }
       },
       {
         "name": "Karty pamięci",
@@ -206,7 +275,10 @@
           "Dyski i nośniki danych",
           "Karty pamięci"
         ],
-        "url": "/kategoria/karty-pamieci-626"
+        "url": "/kategoria/karty-pamieci-626",
+        "scrapTime": {
+          "hours": 8
+        }
       }
     ]
   },
@@ -221,28 +293,40 @@
           "Nintendo",
           "Nintendo Switch"
         ],
-        "url": "/gry-nintendo-switch.bhtml"
+        "url": "/gry-nintendo-switch.bhtml",
+        "scrapTime": {
+          "hours": 9
+        }
       },
       {
         "name": "Smartfony",
         "categories": [
           "Smartfony"
         ],
-        "url": "/telefony-komorkowe.bhtml"
+        "url": "/telefony-komorkowe.bhtml",
+        "scrapTime": {
+          "hours": 10
+        }
       },
       {
         "name": "Smartwatche",
         "categories": [
           "Smartwatche"
         ],
-        "url": "/smartwatch.bhtml"
+        "url": "/smartwatch.bhtml",
+        "scrapTime": {
+          "hours": 11
+        }
       },
       {
         "name": "Telewizory",
         "categories": [
           "Telewizory"
         ],
-        "url": "/telewizory-led-lcd-plazmowe.bhtml"
+        "url": "/telewizory-led-lcd-plazmowe.bhtml",
+        "scrapTime": {
+          "hours": 12
+        }
       }
     ]
   },
@@ -257,7 +341,10 @@
           "Nintendo",
           "Nintendo Switch"
         ],
-        "url": "/gaming/gry/gry-nintendo-switch"
+        "url": "/gaming/gry/gry-nintendo-switch",
+        "scrapTime": {
+          "hours": 13
+        }
       },
       {
         "name": "Głośniki Bluetooth",
@@ -266,7 +353,10 @@
           "Głośniki Bluetooth",
           "Akcesoria komputerowe"
         ],
-        "url": "/telewizory-i-rtv/hi-fi-audio/glosniki-mobilne"
+        "url": "/telewizory-i-rtv/hi-fi-audio/glosniki-mobilne",
+        "scrapTime": {
+          "hours": 14
+        }
       },
       {
         "name": "Monitory",
@@ -274,7 +364,10 @@
           "Monitory",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/monitory-led"
+        "url": "/komputery-i-tablety/monitory-led",
+        "scrapTime": {
+          "hours": 14
+        }
       },
       {
         "name": "Klawiatury",
@@ -282,7 +375,10 @@
           "Klawiatury",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/klawiatury-komputerowe/klawiatury"
+        "url": "/komputery-i-tablety/klawiatury-komputerowe/klawiatury",
+        "scrapTime": {
+          "hours": 15
+        }
       },
       {
         "name": "Odkurzacze pionowe",
@@ -292,7 +388,10 @@
           "Odkurzacze",
           "Odkurzacze pionowe"
         ],
-        "url": "/agd-male/sprzatanie/odkurzacze-pionowe"
+        "url": "/agd-male/sprzatanie/odkurzacze-pionowe",
+        "scrapTime": {
+          "hours": 15
+        }
       },
       {
         "name": "Myszki Uniwersalne",
@@ -300,7 +399,10 @@
           "Myszki",
           "Myszki Uniwersalne"
         ],
-        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-uniwersalne"
+        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-uniwersalne",
+        "scrapTime": {
+          "hours": 15
+        }
       },
       {
         "name": "Myszki Gamingowe",
@@ -309,7 +411,10 @@
           "Myszki Gamingowe",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-dla-graczy"
+        "url": "/komputery-i-tablety/myszy-komputerowe/myszki-dla-graczy",
+        "scrapTime": {
+          "hours": 16
+        }
       },
       {
         "name": "Słuchawki",
@@ -318,7 +423,10 @@
           "Słuchawki z mikrofonem",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-z-mikrofonem"
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-z-mikrofonem",
+        "scrapTime": {
+          "hours": 16
+        }
       },
       {
         "name": "Słuchawki Gamingowe",
@@ -328,21 +436,30 @@
           "Słuchawki z mikrofonem",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-gamingowe"
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/sluchawki-gamingowe",
+        "scrapTime": {
+          "hours": 16
+        }
       },
       {
         "name": "Smartwatche",
         "categories": [
           "Smartwatche"
         ],
-        "url": "/smartfony-i-zegarki/smartwatche-i-zegarki/smartwatche"
+        "url": "/smartfony-i-zegarki/smartwatche-i-zegarki/smartwatche",
+        "scrapTime": {
+          "hours": 17
+        }
       },
       {
         "name": "Smartfony",
         "categories": [
           "Smartfony"
         ],
-        "url": "/smartfony-i-zegarki/smartfony"
+        "url": "/smartfony-i-zegarki/smartfony",
+        "scrapTime": {
+          "hours": 18
+        }
       },
       {
         "name": "Playstation 5 - Gry",
@@ -352,7 +469,10 @@
           "Playstation",
           "Playstation 5"
         ],
-        "url": "/gaming/gry/gry-ps5"
+        "url": "/gaming/gry/gry-ps5",
+        "scrapTime": {
+          "hours": 18
+        }
       },
       {
         "name": "Głośniki komputerowe",
@@ -361,7 +481,10 @@
           "Głośniki komputerowe",
           "Akcesoria komputerowe"
         ],
-        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/glosniki-komputerowe"
+        "url": "/komputery-i-tablety/sluchawki-i-glosniki-komputerowe/glosniki-komputerowe",
+        "scrapTime": {
+          "hours": 18
+        }
       },
       {
         "name": "Karty Graficzne",
@@ -369,7 +492,10 @@
           "Karty graficzne",
           "Podzespoły komputerowe"
         ],
-        "url": "/komputery-i-tablety/podzespoly-komputerowe/karty-graficzne"
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/karty-graficzne",
+        "scrapTime": {
+          "hours": 6
+        }
       },
       {
         "name": "Procesory",
@@ -377,7 +503,10 @@
           "Procesory",
           "Podzespoły komputerowe"
         ],
-        "url": "/komputery-i-tablety/podzespoly-komputerowe/procesory"
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/procesory",
+        "scrapTime": {
+          "hours": 8
+        }
       },
       {
         "name": "Pamięć RAM",
@@ -385,7 +514,10 @@
           "Pamięć RAM",
           "Podzespoły komputerowe"
         ],
-        "url": "/komputery-i-tablety/podzespoly-komputerowe/pamieci-ram"
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/pamieci-ram",
+        "scrapTime": {
+          "hours": 9
+        }
       },
       {
         "name": "Płyty Główne",
@@ -393,7 +525,10 @@
           "Płyty główne",
           "Podzespoły komputerowe"
         ],
-        "url": "/komputery-i-tablety/podzespoly-komputerowe/plyty-glowne"
+        "url": "/komputery-i-tablety/podzespoly-komputerowe/plyty-glowne",
+        "scrapTime": {
+          "hours": 10
+        }
       },
       {
         "name": "Dyski Wewnętrzne SSD",
@@ -403,7 +538,10 @@
           "Dyski SSD",
           "Dyski wewnętrzne"
         ],
-        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-wewnetrzne-ssd"
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-wewnetrzne-ssd",
+        "scrapTime": {
+          "hours": 12
+        }
       },
       {
         "name": "Dyski Wewnętrzne SSD M2",
@@ -414,21 +552,30 @@
           "Dyski SSD M2",
           "Dyski wewnętrzne"
         ],
-        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-ssd-m2"
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-ssd-m2",
+        "scrapTime": {
+          "hours": 13
+        }
       },
       {
         "name": "Tablety",
         "categories": [
           "Tablety"
         ],
-        "url": "/komputery-i-tablety/tablety-i-e-booki/tablety"
+        "url": "/komputery-i-tablety/tablety-i-e-booki/tablety",
+        "scrapTime": {
+          "hours": 17
+        }
       },
       {
         "name": "Czytniki e-booków",
         "categories": [
           "Czytniki e-book"
         ],
-        "url": "/komputery-i-tablety/tablety-i-e-booki/czytniki-e-bookow"
+        "url": "/komputery-i-tablety/tablety-i-e-booki/czytniki-e-bookow",
+        "scrapTime": {
+          "hours": 18
+        }
       },
       {
         "name": "Dyski Zewnętrzne SSD",
@@ -438,7 +585,10 @@
           "Dyski SSD",
           "Dyski zewnętrzne"
         ],
-        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-ssd"
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-ssd",
+        "scrapTime": {
+          "hours": 19
+        }
       },
       {
         "name": "Dyski Zewnętrzne HDD",
@@ -448,7 +598,10 @@
           "Dyski HDD",
           "Dyski zewnętrzne"
         ],
-        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-hdd"
+        "url": "/komputery-i-tablety/dyski-i-pamieci/dyski-zewnetrzne-hdd",
+        "scrapTime": {
+          "hours": 20
+        }
       },
       {
         "name": "Pendrive",
@@ -457,7 +610,10 @@
           "Dyski i nośniki danych",
           "Pendrive"
         ],
-        "url": "/komputery-i-tablety/dyski-i-pamieci/pamieci-flash-pendrive"
+        "url": "/komputery-i-tablety/dyski-i-pamieci/pamieci-flash-pendrive",
+        "scrapTime": {
+          "hours": 21
+        }
       },
       {
         "name": "Playstation 5 - Gry",
@@ -468,7 +624,10 @@
           "Playstation 5",
           "Playstation 4"
         ],
-        "url": "/gaming/gry/gry-ps4/platforma_playstation-5"
+        "url": "/gaming/gry/gry-ps4/platforma_playstation-5",
+        "scrapTime": {
+          "hours": 22
+        }
       }
     ]
   }

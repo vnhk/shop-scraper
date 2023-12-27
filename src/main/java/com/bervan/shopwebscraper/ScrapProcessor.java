@@ -23,7 +23,7 @@ public class ScrapProcessor {
         this.resourceLoader = resourceLoader;
     }
 
-    public void run(boolean scrapInMultiMode, String configFilePath, String... shops) {
+    public void run(boolean scrapInMultiMode, String configFilePath, int hour, String... shops) {
         List<Future> tasks = new ArrayList<>();
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
@@ -40,7 +40,7 @@ public class ScrapProcessor {
                     throw new RuntimeException("Scraper not found for given shop: " + shopName);
                 }
                 //threads
-                tasks.add(executor.submit(() -> scraper.run(root, now)));
+                tasks.add(executor.submit(() -> scraper.run(root, now, hour)));
             }
         }
 

@@ -42,7 +42,7 @@ public abstract class Scraper {
         this.statServerService = statServerService;
     }
 
-    public void run(ConfigRoot config, Date scrapDate) {
+    public void run(ConfigRoot config, Date scrapDate, int hour) {
         executor = Executors.newFixedThreadPool(getNThreadsForConcurrentProcessing());
         List<Offer> offers = new ArrayList<>();
         options();
@@ -51,6 +51,9 @@ public abstract class Scraper {
 
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
+            if (product.getHour() != hour) {
+                continue;
+            }
             ScrapContext context = new ScrapContext();
             context.setRoot(config);
             context.setProduct(product);

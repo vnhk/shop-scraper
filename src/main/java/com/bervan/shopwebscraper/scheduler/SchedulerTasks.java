@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 public class SchedulerTasks {
@@ -19,38 +21,40 @@ public class SchedulerTasks {
         this.statServerService = statServerService;
     }
 
-    @Scheduled(cron = "0 0 4 * * *")
-    public void scrapMediaExpert() throws InterruptedException {
-        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
-        log.info("Media Expert Scraping: STARTED!");
+    @Scheduled(cron = "0 0 8 * * *")
+    public void refreshView1() {
         try {
-            scrapProcessor.run(true, "config.json", "Media Expert");
             statServerService.refreshViews();
-            log.info("Media Expert Scraping: COMPLETED!");
         } catch (Exception e) {
-            log.error("Media Expert Scraping: FAILED!", e);
+            log.error("RefreshingViews: FAILED!", e);
         }
     }
 
-    @Scheduled(cron = "0 10 11 * * *")
-    public void scrapMorele() throws InterruptedException {
-        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
-        log.info("Morele Scraping: STARTED!");
+    @Scheduled(cron = "0 10 15 * * *")
+    public void refreshView2() {
         try {
-            scrapProcessor.run(true, "config.json", "Morele");
             statServerService.refreshViews();
-            log.info("Morele Scraping: COMPLETED!");
         } catch (Exception e) {
-            log.error("Morele Scraping: FAILED!", e);
+            log.error("RefreshingViews: FAILED!", e);
         }
     }
 
-    @Scheduled(cron = "0 0 17 * * *")
+    @Scheduled(cron = "0 0 19 * * *")
+    public void refreshView3() {
+        try {
+            statServerService.refreshViews();
+        } catch (Exception e) {
+            log.error("RefreshingViews: FAILED!", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
     public void scrapRTVEuroAGD() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("RTV Euro AGD Scraping: STARTED!");
         try {
-            scrapProcessor.run(true, "config.json", "RTV Euro AGD");
+            LocalDateTime now = LocalDateTime.now();
+            scrapProcessor.run(true, "config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
             statServerService.refreshViews();
             log.info("RTV Euro AGD Scraping: COMPLETED!");
         } catch (Exception e) {

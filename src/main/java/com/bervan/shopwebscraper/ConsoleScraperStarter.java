@@ -1,5 +1,7 @@
 package com.bervan.shopwebscraper;
 
+import java.time.LocalDateTime;
+
 public class ConsoleScraperStarter {
 
     public static void main(String[] args) {
@@ -17,14 +19,14 @@ public class ConsoleScraperStarter {
     }
 
     private static void scrapAll(ScrapProcessor scraper) {
-        scraper.run(true, "config.json", "Media Expert", "RTV Euro AGD");
+        scraper.run(true, "config.json", LocalDateTime.now().getHour(), "Media Expert", "RTV Euro AGD");
     }
 
     private static void scrapOnlyRTV(ScrapProcessor scraper) {
-        scraper.run(false, "config.json", "RTV Euro AGD");
+        scraper.run(false, "config.json", LocalDateTime.now().getHour(), "RTV Euro AGD");
     }
 
     private static void scrapOnlyMediaExpert(ScrapProcessor scraper) {
-        scraper.run(false, "config.json", "Media Expert");
+        scraper.run(false, "config.json", LocalDateTime.now().getHour(), "Media Expert");
     }
 }
