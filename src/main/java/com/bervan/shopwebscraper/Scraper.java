@@ -51,7 +51,7 @@ public abstract class Scraper {
 
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
-            if (product.getScrapTime().getHour() != hour) {
+            if (product.getScrapTime().getHours() != hour) {
                 continue;
             }
             ScrapContext context = new ScrapContext();

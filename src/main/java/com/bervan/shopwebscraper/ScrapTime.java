@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ScrapTime {
-    private Integer hour;
+    private Integer hours;
 }
