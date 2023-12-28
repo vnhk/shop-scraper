@@ -71,7 +71,6 @@ public class ScrapProcessor {
 
     public List<String> getLogs(Integer linesFromEnd) {
         List<String> res = new ArrayList<>();
-        System.out.println("PATH: " + path);
         File file = new File(path);
         int counter = 0;
         try (ReversedLinesFileReader object = new ReversedLinesFileReader(file)) {
