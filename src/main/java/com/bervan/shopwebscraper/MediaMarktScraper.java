@@ -21,7 +21,7 @@ public class MediaMarktScraper extends Scraper {
     private final String PAGE_SIZE = "50";
 
     @Override
-    public void run(ConfigRoot config, Date scrapDate, int hour) {
+    public void run(ConfigRoot config, Date scrapDate, Integer hour) {
         System.err.println("Not supported... yet....");
     }
 

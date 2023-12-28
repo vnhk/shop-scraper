@@ -1,12 +1,9 @@
 package com.bervan.shopwebscraper;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +19,17 @@ public class ScrapController {
     }
 
     @PostMapping("/scrap")
-    public ResponseEntity<List<String>> scrap(@RequestParam String shopNames) {
+    @CrossOrigin("*")
+    public ResponseEntity<List<String>> scrap(@RequestParam String shopNames, @RequestParam(required = false) Integer hour) {
         String[] shops = shopNames.split(",");
-        scrapProcessor.run(true, "config.json", LocalDateTime.now().getHour(), shops);
+        scrapProcessor.run(true, "config.json", hour, shops);
 
         return ResponseEntity.of(Optional.of(Arrays.asList("No messages configured yet...")));
+    }
+
+    @GetMapping("/logs")
+    @CrossOrigin("*")
+    private ResponseEntity<List<String>> getLogs(@RequestParam Integer linesFromEnd) {
+        return new ResponseEntity<>(scrapProcessor.getLogs(linesFromEnd), HttpStatus.OK);
     }
 }

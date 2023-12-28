@@ -37,7 +37,6 @@ public class StatServerService {
                 new HashMap<>(), Map.class);
         List<String> messages = (List) result.get("messages");
         if (!messages.isEmpty()) {
-            System.out.println("Views could not be refreshed:");
             for (String message : messages) {
                 System.out.println("- " + message);
             }

@@ -1,10 +1,13 @@
 package com.bervan.shopwebscraper;
 
 import com.google.gson.Gson;
+import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -17,13 +20,15 @@ import java.util.concurrent.TimeUnit;
 public class ScrapProcessor {
     private final Map<String, Scraper> scrapers;
     private final ResourceLoader resourceLoader;
+    @Value("${logs.path}")
+    private String path = "";
 
     public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader) {
         this.scrapers = scrapers;
         this.resourceLoader = resourceLoader;
     }
 
-    public void run(boolean scrapInMultiMode, String configFilePath, int hour, String... shops) {
+    public void run(boolean scrapInMultiMode, String configFilePath, Integer hour, String... shops) {
         List<Future> tasks = new ArrayList<>();
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
@@ -62,5 +67,22 @@ public class ScrapProcessor {
         } catch (IOException e) {
             throw new RuntimeException("Unable to load config!");
         }
+    }
+
+    public List<String> getLogs(Integer linesFromEnd) {
+        List<String> res = new ArrayList<>();
+        File file = new File(path);
+        int counter = 0;
+        try (ReversedLinesFileReader object = new ReversedLinesFileReader(file)) {
+            while (counter < linesFromEnd) {
+                res.add(object.readLine());
+                counter++;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return res;
     }
 }
