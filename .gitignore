@@ -40,3 +40,4 @@ build/
 .vscode/
 
 src/main/resources/application-pi.properties
+/scrap_files/
