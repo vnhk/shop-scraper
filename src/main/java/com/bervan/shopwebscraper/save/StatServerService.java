@@ -35,7 +35,7 @@ public class StatServerService {
     }
 
     private void refresh(Set<String> res, String endpoint) {
-        Map result = restTemplate.postForObject(
+        Map result = getRestTemplate().postForObject(
                 getStatServerHost() + ":" + STAT_SERVER_PORT + endpoint,
                 new HashMap<>(), Map.class);
         List<String> messages = (List) result.get("messages");
@@ -52,7 +52,7 @@ public class StatServerService {
         try {
             List<List<Offer>> partition = Lists.partition(offers, 300);
             for (List<Offer> offerList : partition) {
-                Map result = restTemplate.postForObject(
+                Map result = getRestTemplate().postForObject(
                         getUrl(), offerList, Map.class);
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
@@ -69,6 +69,13 @@ public class StatServerService {
         return res;
     }
 
+    private RestTemplate getRestTemplate() {
+        if(restTemplate == null) {
+            return new RestTemplate();
+        }
+        return restTemplate;
+    }
+
     private String getUrl() {
         String url = getStatServerHost() + ":" + STAT_SERVER_PORT + "/products";
         if (sendToQueue) {
@@ -79,5 +86,9 @@ public class StatServerService {
 
     private String getStatServerHost() {
         return STAT_SERVER_HOST.contains("http") ? STAT_SERVER_HOST : "http://" + STAT_SERVER_HOST;
+    }
+
+    public void setSendToQueue(Boolean sendToQueue) {
+        this.sendToQueue = sendToQueue;
     }
 }

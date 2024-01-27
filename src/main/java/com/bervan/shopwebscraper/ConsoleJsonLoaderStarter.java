@@ -25,13 +25,14 @@ public class ConsoleJsonLoaderStarter {
 
     private static void loadDir(String dirName) {
         StatServerService statServerService = new StatServerService();
+        statServerService.setSendToQueue(true);
         JsonService service = new JsonService();
         File folder = new File("./" + dirName);
         Set<File> listOfFiles = Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(File::isFile)
                 .filter(f -> f.getName().endsWith(".json")).collect(Collectors.toSet());
         for (File file : listOfFiles) {
-            List<Offer> load = service.load(file.getName());
+            List<Offer> load = service.load("./" + dirName + "/" + file.getName());
             updateDate(load);
             try {
                 statServerService.save(load);
