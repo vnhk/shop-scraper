@@ -17,6 +17,9 @@ public class StatServerService {
     @Value("${stat-server.port:8080}")
     private String STAT_SERVER_PORT = "8080";
 
+    @Value("${send-to-queue:false}")
+    private Boolean sendToQueue = false;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -50,7 +53,7 @@ public class StatServerService {
             List<List<Offer>> partition = Lists.partition(offers, 300);
             for (List<Offer> offerList : partition) {
                 Map result = restTemplate.postForObject(
-                        getStatServerHost() + ":" + STAT_SERVER_PORT + "/products", offerList, Map.class);
+                        getUrl(), offerList, Map.class);
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
                     System.out.println("Not all products have been saved due to the following reasons:");
@@ -64,6 +67,14 @@ public class StatServerService {
             throw new SavingOffersToDBException("Saving to the database failed!", e);
         }
         return res;
+    }
+
+    private String getUrl() {
+        String url = getStatServerHost() + ":" + STAT_SERVER_PORT + "/products";
+        if (sendToQueue) {
+            url += "/async";
+        }
+        return url;
     }
 
     private String getStatServerHost() {
