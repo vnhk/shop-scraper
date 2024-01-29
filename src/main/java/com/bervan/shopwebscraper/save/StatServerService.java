@@ -27,10 +27,16 @@ public class StatServerService {
         Set<String> res = new HashSet<>();
         try {
             refresh(res, "/products/refresh-materialized-views");
-            refresh(res, "/favorites/refresh-materialized-views");
+            res.addAll(refreshFavorites());
         } catch (Exception e) {
             throw new SavingOffersToDBException("Views could not be refreshed!", e);
         }
+        return res;
+    }
+
+    public Set<String> refreshFavorites() {
+        Set<String> res = new HashSet<>();
+        refresh(res, "/favorites/refresh-materialized-views");
         return res;
     }
 

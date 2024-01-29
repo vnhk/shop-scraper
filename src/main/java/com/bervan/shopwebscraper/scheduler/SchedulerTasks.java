@@ -31,6 +31,16 @@ public class SchedulerTasks {
     }
 
     @Scheduled(cron = "0 0 * * * *")
+    public void refreshFavorites() throws InterruptedException {
+        Thread.sleep(15000 + RandomUtil.getPositiveInt() % 15000);
+        try {
+            statServerService.refreshFavorites();
+        } catch (Exception e) {
+            log.error("RefreshingViews: FAILED!", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
     public void scrapRTVEuroAGD() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Scraping: STARTED!");
