@@ -47,7 +47,6 @@ public class SchedulerTasks {
         try {
             LocalDateTime now = LocalDateTime.now();
             scrapProcessor.run(true, "config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
-            statServerService.refreshViews();
             log.info("Scraping: COMPLETED!");
         } catch (Exception e) {
             log.error("Scraping: FAILED!", e);
