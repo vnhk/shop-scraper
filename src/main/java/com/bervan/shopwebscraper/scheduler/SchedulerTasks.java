@@ -41,7 +41,7 @@ public class SchedulerTasks {
     }
 
     @Scheduled(cron = "0 0 * * * *")
-    public void scrapRTVEuroAGD() throws InterruptedException {
+    public void scrap() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Scraping: STARTED!");
         try {
