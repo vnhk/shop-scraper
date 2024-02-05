@@ -44,7 +44,11 @@ public class RTVEuroAGDScraper extends Scraper {
     protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
-        String info = parsed.getElementsByClass("progress-info").get(0).text().trim();
+        Elements elementsByClass = parsed.getElementsByClass("progress-info");
+        if (elementsByClass.size() == 0) {
+            return 1;
+        }
+        String info = elementsByClass.get(0).text().trim();
         if (info.startsWith("Zobaczyłeś " + PAGE_SIZE + " z " + PAGE_SIZE)) {
             //only one page
             return 1;

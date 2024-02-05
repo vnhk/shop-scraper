@@ -99,8 +99,21 @@ public class MoreleScraper extends Scraper {
                 .split("zł")[0]
                 .split(",")[0]
                 .trim();
-        return price.replaceAll("od", "")
+        price = price.replaceAll("od", "")
                 .replaceAll(" ", "");
+
+        Elements outletButton = offer.select(".cat-product-outlet-button");
+        if (outletButton.size() != 0) {
+            String text = outletButton.get(0).text();
+            String outletPrice = text.split(" od ")[1].split(" zł")[0].split(",")[0]
+                    .replaceAll(" ", "").trim();
+
+            if (outletPrice.equals(price)) {
+                throw new SkipProcessingException("Product is outlet product!");
+            }
+        }
+
+        return price;
     }
 
     @Override

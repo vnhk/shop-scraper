@@ -51,7 +51,7 @@ public abstract class Scraper {
 
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
-            if (product.getScrapTime().getHours().equals(hour)) {
+            if (!product.getScrapTime().getHours().equals(hour)) {
                 continue;
             }
             ScrapContext context = new ScrapContext();
@@ -220,20 +220,26 @@ public abstract class Scraper {
 
     protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         for (Element offerElement : offerElements) {
-            String offerName = sanitize(getOfferName(offerElement, context));
-            String href = sanitize(getOfferHref(offerElement, context));
-            String imgSrc = sanitize(getOfferImgHref(offerElement, context));
-            String offerPrice = sanitize(getOfferPrice(offerElement, context));
+            try {
+                String offerName = sanitize(getOfferName(offerElement, context));
+                log.info("Processing Offer:" + offerName);
+                String href = sanitize(getOfferHref(offerElement, context));
+                String imgSrc = sanitize(getOfferImgHref(offerElement, context));
+                String offerPrice = sanitize(getOfferPrice(offerElement, context));
 
-            Offer offer = new Offer();
-            offer.put("Name", offerName);
-            offer.put("Price", offerPrice);
-            offer.put("Offer Url", href);
-            offer.put("Image", imgSrc);
+                Offer offer = new Offer();
+                offer.put("Name", offerName);
+                offer.put("Price", offerPrice);
+                offer.put("Offer Url", href);
+                offer.put("Image", imgSrc);
 
-            processProductAdditionalAttributes(offerElement, offer, context);
+                processProductAdditionalAttributes(offerElement, offer, context);
 
-            productOffers.add(offer);
+                productOffers.add(offer);
+            } catch (SkipProcessingException e) {
+                log.info("Offer is skipped:");
+                log.info(e.getMessage());
+            }
         }
     }
 
