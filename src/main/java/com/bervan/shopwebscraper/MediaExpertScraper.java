@@ -90,7 +90,11 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected String getOfferImgHref(Element offer, ScrapContext context) {
-        return getFirstIfFoundAttrByCssQuery(offer, "div.product-list-gallery-slider.is-possible-hover > a > div:nth-child(1) > img", "src");
+        String src = getFirstIfFoundAttrByCssQuery(offer, "div.product-list-gallery-slider.is-possible-hover > a > div:nth-child(1) > img", "src");
+        if (src == null || src.isBlank()) {
+            return getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
+        }
+        return src;
     }
 
     @Override
