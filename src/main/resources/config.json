@@ -334,6 +334,67 @@
         }
       },
       {
+        "name": "Odkurzacze pionowe",
+        "categories": [
+          "Sprzątanie",
+          "AGD",
+          "Odkurzacze",
+          "Odkurzacze pionowe"
+        ],
+        "url": "/odkurzacze-pionowe.bhtml",
+        "scrapTime": {
+          "hours": 20
+        }
+      },
+      {
+        "name": "Grille elektryczne",
+        "categories": [
+          "Grille",
+          "AGD",
+          "Kuchnia"
+        ],
+        "url": "/grille.bhtml",
+        "scrapTime": {
+          "hours": 21
+        }
+      },
+      {
+        "name": "Opiekacze do kanapek",
+        "categories": [
+          "Opiekacze",
+          "AGD",
+          "Kuchnia"
+        ],
+        "url": "/sandwicze.bhtml",
+        "scrapTime": {
+          "hours": 21
+        }
+      },
+      {
+        "name": "Gofrownice",
+        "categories": [
+          "Gofrownice",
+          "AGD",
+          "Kuchnia"
+        ],
+        "url": "/gofrownice.bhtml",
+        "scrapTime": {
+          "hours": 21
+        }
+      },
+      {
+        "name": "Roboty kuchenne",
+        "categories": [
+          "Roboty kuchenne",
+          "AGD",
+          "Kuchnia"
+        ],
+        "url": "/roboty-wieloczynnosciowe.bhtml",
+        "scrapTime": {
+          "hours": 21
+        }
+      },
+      {
         "name": "Smartfony",
         "categories": [
           "Smartfony"
