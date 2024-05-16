@@ -4,6 +4,17 @@
     "baseUrl": "https://www.morele.net",
     "products": [
       {
+        "name": "Obudowy do komputera",
+        "categories": [
+          "PC",
+          "Obudowy do komputera"
+        ],
+        "url": "/kategoria/obudowy-33",
+        "scrapTime": {
+          "hours": 1
+        }
+      },
+      {
         "name": "Nintendo Switch - Gry",
         "categories": [
           "Gry",
