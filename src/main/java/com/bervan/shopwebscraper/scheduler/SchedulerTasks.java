@@ -21,26 +21,26 @@ public class SchedulerTasks {
         this.statServerService = statServerService;
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
-    public void refreshView1() {
-        try {
-            statServerService.refreshViews();
-        } catch (Exception e) {
-            log.error("RefreshingViews: FAILED!", e);
-        }
-    }
+//    @Scheduled(cron = "0 0 3 * * *")
+//    public void refreshView1() {
+//        try {
+//            statServerService.refreshViews();
+//        } catch (Exception e) {
+//            log.error("RefreshingViews: FAILED!", e);
+//        }
+//    }
+//
+//    @Scheduled(cron = "0 0 * * * *")
+//    public void refreshFavorites() throws InterruptedException {
+//        Thread.sleep(15000 + RandomUtil.getPositiveInt() % 15000);
+//        try {
+//            statServerService.refreshFavorites();
+//        } catch (Exception e) {
+//            log.error("RefreshingViews: FAILED!", e);
+//        }
+//    }
 
-    @Scheduled(cron = "0 0 * * * *")
-    public void refreshFavorites() throws InterruptedException {
-        Thread.sleep(15000 + RandomUtil.getPositiveInt() % 15000);
-        try {
-            statServerService.refreshFavorites();
-        } catch (Exception e) {
-            log.error("RefreshingViews: FAILED!", e);
-        }
-    }
-
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "* * * * * *")
     public void scrap() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Scraping: STARTED!");
