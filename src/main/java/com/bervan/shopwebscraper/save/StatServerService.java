@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Service
@@ -18,6 +20,9 @@ public class StatServerService {
 
     @Value("${stat-server.port:8080}")
     private String STAT_SERVER_PORT = "8080";
+
+    @Value("${stat-server.apiKey}")
+    private String apiKey;
 
     @Value("${send-to-queue:false}")
     private Boolean sendToQueue = false;
@@ -36,13 +41,13 @@ public class StatServerService {
         return res;
     }
 
-    public Set<String> refreshFavorites() {
+    public Set<String> refreshFavorites() throws NoSuchAlgorithmException, KeyManagementException {
         Set<String> res = new HashSet<>();
         refresh(res, "/favorites/refresh-materialized-views");
         return res;
     }
 
-    private void refresh(Set<String> res, String endpoint) {
+    private void refresh(Set<String> res, String endpoint) throws NoSuchAlgorithmException, KeyManagementException {
         Map result = getRestTemplate().postForObject(
                 getStatServerHost() + ":" + STAT_SERVER_PORT + endpoint,
                 new HashMap<>(), Map.class);
@@ -60,8 +65,11 @@ public class StatServerService {
         try {
             List<List<Offer>> partition = Lists.partition(offers, 300);
             for (List<Offer> offerList : partition) {
+                HashMap<String, Object> requestData = new HashMap<>();
+                requestData.put("apiKey", apiKey);
+                requestData.put("addProductsQueueParam", offerList);
                 Map result = getRestTemplate().postForObject(
-                        getUrl(), offerList, Map.class);
+                        getUrl(), requestData, Map.class);
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
                     log.warn("Not all products have been saved due to the following reasons:");
@@ -77,10 +85,7 @@ public class StatServerService {
         return res;
     }
 
-    private RestTemplate getRestTemplate() {
-        if(restTemplate == null) {
-            return new RestTemplate();
-        }
+    private RestTemplate getRestTemplate() throws NoSuchAlgorithmException, KeyManagementException {
         return restTemplate;
     }
 

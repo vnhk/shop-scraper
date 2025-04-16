@@ -96,7 +96,39 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.p12</include>
+                    <include>**/*.pem</include>
+                    <include>**/*.jks</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.json</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <version>${maven-resources-plugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <nonFilteredFileExtensions>-->
+<!--                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>-->
+<!--                    </nonFilteredFileExtensions>-->
+<!--                </configuration>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.apache.maven.shared</groupId>-->
+<!--                        <artifactId>maven-filtering</artifactId>-->
+<!--                        <version>${maven-filtering.version}</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
