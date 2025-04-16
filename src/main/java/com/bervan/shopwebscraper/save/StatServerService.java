@@ -2,6 +2,7 @@ package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
+@Slf4j
 public class StatServerService {
     @Value("${stat-server.host:http://localhost}")
     private String STAT_SERVER_HOST = "http://localhost";
@@ -62,9 +64,9 @@ public class StatServerService {
                         getUrl(), offerList, Map.class);
                 List<String> messages = (List) result.get("messages");
                 if (!messages.isEmpty()) {
-                    System.out.println("Not all products have been saved due to the following reasons:");
+                    log.warn("Not all products have been saved due to the following reasons:");
                     for (String message : messages) {
-                        System.out.println("- " + message);
+                        log.warn("- {}", message);
                     }
                     res.addAll(messages);
                 }

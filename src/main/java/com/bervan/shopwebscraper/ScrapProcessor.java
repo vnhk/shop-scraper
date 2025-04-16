@@ -1,6 +1,7 @@
 package com.bervan.shopwebscraper;
 
 import com.google.gson.Gson;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -32,7 +33,8 @@ public class ScrapProcessor {
         List<Future> tasks = new ArrayList<>();
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
-        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
+//        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
+        ExecutorService executor = Executors.newFixedThreadPool(1);
         if (!scrapInMultiMode) {
             executor = Executors.newFixedThreadPool(1);
         }

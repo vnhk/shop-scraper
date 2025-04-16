@@ -103,11 +103,16 @@ public abstract class Scraper {
 
     private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
         try {
-            String filenamePrefix = getFilenamePrefix(config);
-            LogUtils.info(log, context, "Saving to files...");
-            jsonService.save(offers, filenamePrefix);
-            excelService.save(offers, filenamePrefix);
-            LogUtils.info(log, context, "Saved to files...");
+            if (offers.size() > 0) {
+                String filenamePrefix = getFilenamePrefix(config);
+                LogUtils.info(log, context, "Saving to files...");
+                jsonService.save(offers, filenamePrefix);
+                excelService.save(offers, filenamePrefix);
+                LogUtils.info(log, context, "Saved to files...");
+            } else {
+                LogUtils.info(log, context, "No offers to process!");
+            }
+
         } catch (Exception e) {
             LogUtils.error(log, context, "Could not save to file!", e);
         }
@@ -171,9 +176,14 @@ public abstract class Scraper {
                     driver.quit();
 
                     try {
-                        LogUtils.info(log, context, "Saving to database...");
-                        statServerService.save(productOffers);
-                        LogUtils.info(log, context, "Saved to database...");
+                        if(!productOffers.isEmpty()) {
+                            LogUtils.info(log, context, "Saving to database...");
+                            statServerService.save(productOffers);
+                            LogUtils.info(log, context, "Saved to database...");
+                        } else {
+                            LogUtils.info(log, context, "No offers to save to the database");
+                        }
+
                     } catch (SavingOffersToDBException e) {
                         LogUtils.error(log, context, "Could not save to database:", e);
                     }
@@ -219,10 +229,10 @@ public abstract class Scraper {
     protected abstract List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context);
 
     protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
+        LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context));
-                log.info("Processing Offer:" + offerName);
                 String href = sanitize(getOfferHref(offerElement, context));
                 String imgSrc = sanitize(getOfferImgHref(offerElement, context));
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
@@ -237,8 +247,7 @@ public abstract class Scraper {
 
                 productOffers.add(offer);
             } catch (SkipProcessingException e) {
-                log.info("Offer is skipped:");
-                log.info(e.getMessage());
+                LogUtils.info(log, context, "Offer is skipped: " + e.getMessage());
             }
         }
     }

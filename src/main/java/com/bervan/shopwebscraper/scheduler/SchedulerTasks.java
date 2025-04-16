@@ -3,6 +3,8 @@ package com.bervan.shopwebscraper.scheduler;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import com.bervan.shopwebscraper.ScrapProcessor;
 import com.bervan.shopwebscraper.save.StatServerService;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,12 @@ public class SchedulerTasks {
 
     private final ScrapProcessor scrapProcessor;
     private final StatServerService statServerService;
+
+    @PostConstruct
+    public void initDriver() {
+        WebDriverManager.chromedriver()
+                .setup();
+    }
 
     public SchedulerTasks(ScrapProcessor scrapProcessor, StatServerService statServerService) {
         this.scrapProcessor = scrapProcessor;
