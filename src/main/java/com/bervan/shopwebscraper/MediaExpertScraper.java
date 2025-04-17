@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -89,10 +90,17 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(Element offer, ScrapContext context) {
+    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
         String src = getFirstIfFoundAttrByCssQuery(offer, "div.product-list-gallery-slider.is-possible-hover > a > div:nth-child(1) > img", "src");
         if (src == null || src.isBlank()) {
-            return getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
+            src = getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
+            if (src == null || src.isBlank()) {
+                WebDriver newDriver = new ChromeDriver(options);
+                applyWait(newDriver);
+                newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
+                Document parse = Jsoup.parse(newDriver.getPageSource());
+                return parse.selectFirst(".product-gallery > .picture .spark-image").attr("src");
+            }
         }
         return src;
     }

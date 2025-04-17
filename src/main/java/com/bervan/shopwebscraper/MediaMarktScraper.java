@@ -114,7 +114,7 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(Element offer, ScrapContext context) {
+    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
         return null;
     }
 

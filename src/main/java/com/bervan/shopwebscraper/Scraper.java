@@ -10,19 +10,23 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -159,7 +163,7 @@ public abstract class Scraper {
                     List<Offer> productOffers = new ArrayList<>();
 
                     String url = baseUrl + context.getProduct().getUrl();
-                    goToPage(driver, url, context);
+                    goToFirstPage(driver, url, context);
                     int pages = getNumberOfPages(driver, context);
                     processPages(driver, pages, productOffers, url, context);
 
@@ -199,8 +203,19 @@ public abstract class Scraper {
         });
     }
 
-    protected void goToPage(WebDriver driver, String url, ScrapContext context) {
+    public static void applyWait(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+    }
+
+    protected void goToFirstPage(WebDriver driver, String url, ScrapContext context) {
+        applyWait(driver);
         driver.get(getFirstPageUrlWithParams(url, context));
+    }
+
+    protected void goToPage(WebDriver driver, String url, ScrapContext context) {
+        applyWait(driver);
+        driver.get(url);
     }
 
     protected abstract String getFirstPageUrlWithParams(String url, ScrapContext context);
@@ -209,7 +224,7 @@ public abstract class Scraper {
 
     protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers, ScrapContext context) {
         List<Element> offerElements = loadAllOffersTiles(driver, context);
-        parseOffers(offerElements, productOffers, context);
+        parseOffers(driver, offerElements, productOffers, context);
     }
 
     protected void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url, ScrapContext context) {
@@ -228,13 +243,17 @@ public abstract class Scraper {
 
     protected abstract List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context);
 
-    protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
+    protected void parseOffers(WebDriver driver, List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context));
                 String href = sanitize(getOfferHref(offerElement, context));
-                String imgSrc = sanitize(getOfferImgHref(offerElement, context));
+                String imgSrc = sanitize(getOfferImgHref(driver, offerElement, context));
+                if (Strings.isNotBlank(imgSrc)) {
+                    imgSrc = convertToBase64IfPossible(imgSrc);
+                }
+
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
 
                 Offer offer = new Offer();
@@ -252,13 +271,34 @@ public abstract class Scraper {
         }
     }
 
+    private String convertToBase64IfPossible(String imgSrc) {
+        if (imgSrc.startsWith("http")) {
+            try (InputStream inputStream = new URL(imgSrc).openStream();
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                byte[] imageBytes = outputStream.toByteArray();
+                return Base64.getEncoder().encodeToString(imageBytes);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return imgSrc;
+        }
+    }
+
     protected abstract void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context);
 
     protected abstract String getOfferPrice(Element offer, ScrapContext context);
 
     protected abstract String getOfferHref(Element offer, ScrapContext context);
 
-    protected abstract String getOfferImgHref(Element offer, ScrapContext context);
+    protected abstract String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context);
 
     protected abstract String getOfferName(Element offer, ScrapContext context);
 

@@ -122,7 +122,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(Element offer, ScrapContext context) {
+    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
         String src = getFirstIfFoundAttrByCssQuery(offer, "div.cat-product-left > a > picture > img", "src");
         if (src == null || src.isBlank()) {
             return getFirstIfFoundAttrByCssQuery(offer, "div.cat-product-left > a > picture > img", "data-src");
