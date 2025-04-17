@@ -7,7 +7,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -30,8 +30,9 @@ public class MediaMarktScraper extends Scraper {
         return 1;
     }
 
-    public MediaMarktScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
-        super(jsonService, excelService, statServerService);
+    public MediaMarktScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+                             @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
+        super(jsonService, excelService, statServerService, userAgents);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
+    protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         String info = parsed.getElementsByClass("more-offers").get(0)
@@ -70,7 +71,7 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
+    protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("offer");
     }
@@ -114,7 +115,7 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
         return null;
     }
 

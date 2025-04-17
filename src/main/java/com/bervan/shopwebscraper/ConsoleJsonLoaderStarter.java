@@ -25,7 +25,6 @@ public class ConsoleJsonLoaderStarter {
 
     private static void loadDir(String dirName) {
         StatServerService statServerService = new StatServerService();
-        statServerService.setSendToQueue(true);
         JsonService service = new JsonService();
         File folder = new File("./" + dirName);
         Set<File> listOfFiles = Arrays.stream(Objects.requireNonNull(folder.listFiles()))

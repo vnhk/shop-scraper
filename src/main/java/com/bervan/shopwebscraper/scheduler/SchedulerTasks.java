@@ -48,7 +48,7 @@ public class SchedulerTasks {
 //        }
 //    }
 
-    @Scheduled(cron = "* * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void scrap() throws InterruptedException {
         Thread.sleep(RandomUtil.getPositiveInt() % 15000);
         log.info("Scraping: STARTED!");

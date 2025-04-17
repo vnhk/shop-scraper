@@ -8,7 +8,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +20,9 @@ public class MoreleScraper extends Scraper {
     @Value("${MORELE_N_THREADS:1}")
     private final Integer N_THREADS = 1;
 
-    public MoreleScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
-        super(jsonService, excelService, statServerService);
+    public MoreleScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+                         @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
+        super(jsonService, excelService, statServerService, userAgents);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
+    protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         Elements paginationLastPage = parsed.getElementsByClass("pagination-btn-nolink-anchor");
@@ -55,7 +55,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
+    protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("cat-product");
     }
@@ -122,7 +122,7 @@ public class MoreleScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
         String src = getFirstIfFoundAttrByCssQuery(offer, "div.cat-product-left > a > picture > img", "src");
         if (src == null || src.isBlank()) {
             return getFirstIfFoundAttrByCssQuery(offer, "div.cat-product-left > a > picture > img", "data-src");

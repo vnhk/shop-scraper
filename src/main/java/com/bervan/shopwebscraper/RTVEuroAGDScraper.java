@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -20,8 +21,9 @@ public class RTVEuroAGDScraper extends Scraper {
 
     private static final String PAGE_SIZE = "15";
 
-    public RTVEuroAGDScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
-        super(jsonService, excelService, statServerService);
+    public RTVEuroAGDScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+                             @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
+        super(jsonService, excelService, statServerService, userAgents);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class RTVEuroAGDScraper extends Scraper {
 //    }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
+    protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         Elements elementsByClass = parsed.getElementsByClass("progress-info");
@@ -70,7 +72,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
+    protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Elements offers = loadOffers(driver);
 
         int tries = 0;
@@ -141,7 +143,7 @@ public class RTVEuroAGDScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
         return getFirstIfFoundAttrByCssQuery(offer, "div.box-medium__photo > img", "src");
     }
 

@@ -7,8 +7,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +20,8 @@ public class MediaExpertScraper extends Scraper {
     @Value("${MEDIA_EXPERT_N_THREADS:1}")
     private final Integer N_THREADS = 1;
 
-    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
-        super(jsonService, excelService, statServerService);
+    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService, @Value("#{'${USER_AGENTS}'.split(',,,,')}")  List<String> userAgents) {
+        super(jsonService, excelService, statServerService, userAgents);
     }
 
     @Override
@@ -37,7 +35,7 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected int getNumberOfPages(WebDriver driver, ScrapContext context) {
+    protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         String pages = parsed.getElementsByClass("pagination").get(0)
@@ -46,7 +44,7 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context) {
+    protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("offer-box");
     }
@@ -90,12 +88,11 @@ public class MediaExpertScraper extends Scraper {
     }
 
     @Override
-    protected String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context) {
+    protected String getOfferImgHref(Element offer, ScrapContext context) {
         String src = getFirstIfFoundAttrByCssQuery(offer, "div.product-list-gallery-slider.is-possible-hover > a > div:nth-child(1) > img", "src");
         if (src == null || src.isBlank()) {
             src = getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
             if (src == null || src.isBlank()) {
-                WebDriver newDriver = new ChromeDriver(options);
                 applyWait(newDriver);
                 newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
                 Document parse = Jsoup.parse(newDriver.getPageSource());

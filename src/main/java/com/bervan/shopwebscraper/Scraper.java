@@ -18,7 +18,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -34,25 +33,32 @@ import java.util.concurrent.*;
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
     private ExecutorService executor;
+    protected WebDriver driver;
+    protected WebDriver newDriver;
     private final JsonService jsonService;
     private final ExcelService excelService;
     private final StatServerService statServerService;
-    @Value("#{'${USER_AGENTS}'.split(',,,,')}")
-    private List<String> userAgents;
+    private final List<String> userAgents;
 
-    public Scraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService) {
+    public Scraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService, List<String> userAgents) {
         this.jsonService = jsonService;
         this.excelService = excelService;
         this.statServerService = statServerService;
+        this.userAgents = userAgents;
+    }
+
+    public synchronized void create() {
+        if (driver == null || newDriver == null) {
+            options();
+            driver = new ChromeDriver(options);
+            newDriver = new ChromeDriver(options);
+        }
     }
 
     public void run(ConfigRoot config, Date scrapDate, Integer hour) {
         executor = Executors.newFixedThreadPool(getNThreadsForConcurrentProcessing());
+        create();
         List<Offer> offers = new ArrayList<>();
-        options();
-
-//        waitAndRunBrowserToPreventExceptionOnStart(config);
-
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
             if (!product.getScrapTime().getHours().equals(hour)) {
@@ -74,22 +80,6 @@ public abstract class Scraper {
 
         LogUtils.info(log, context, "Processed {} offers.", offers.size());
         saveToFile(config, offers, context);
-    }
-
-    private void waitAndRunBrowserToPreventExceptionOnStart(ConfigRoot config) {
-        try {
-            ChromeDriver driver = new ChromeDriver(options);
-            driver.get(config.getBaseUrl());
-            driver.quit();
-            driver = new ChromeDriver(options);
-            driver.get(config.getBaseUrl());
-            driver.quit();
-            driver = new ChromeDriver(options);
-            driver.get(config.getBaseUrl());
-            driver.quit();
-        } catch (Exception e) {
-            log.error("waitAndRunBrowserToPreventExceptionOnStart:", e);
-        }
     }
 
     protected abstract int getNThreadsForConcurrentProcessing();
@@ -157,15 +147,14 @@ public abstract class Scraper {
             Callable<List<Offer>> callable = () -> {
                 String threadName = Thread.currentThread().getName();
                 context.setThread(threadName);
-                WebDriver driver = new ChromeDriver(options);
                 try {
                     LogUtils.info(log, context, "Started processing products.");
                     List<Offer> productOffers = new ArrayList<>();
 
                     String url = baseUrl + context.getProduct().getUrl();
-                    goToFirstPage(driver, url, context);
-                    int pages = getNumberOfPages(driver, context);
-                    processPages(driver, pages, productOffers, url, context);
+                    goToFirstPage(url, context);
+                    int pages = getNumberOfPages(context);
+                    processPages(pages, productOffers, url, context);
 
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                     String formattedDate = simpleDateFormat.format(context.getScrapDate());
@@ -177,7 +166,6 @@ public abstract class Scraper {
                         offer.put("Product List Url", context.getProduct().getUrl());
                         offer.put("Shop", context.getRoot().getShopName());
                     }
-                    driver.quit();
 
                     try {
                         if(!productOffers.isEmpty()) {
@@ -195,8 +183,12 @@ public abstract class Scraper {
                     return productOffers;
                 } catch (Exception e) {
                     LogUtils.error(log, context, "Could not parse products:", e);
-                    driver.quit();
                     throw new ProductScrapException("Could not parse products " + context.getProduct().getName() + "!", context.getProduct());
+                } finally {
+                    driver.quit();
+                    newDriver.quit();
+                    driver = null;
+                    newDriver = null;
                 }
             };
             return retryer.call(callable);
@@ -208,48 +200,48 @@ public abstract class Scraper {
         wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
     }
 
-    protected void goToFirstPage(WebDriver driver, String url, ScrapContext context) {
+    protected void goToFirstPage(String url, ScrapContext context) {
         applyWait(driver);
         driver.get(getFirstPageUrlWithParams(url, context));
     }
 
-    protected void goToPage(WebDriver driver, String url, ScrapContext context) {
+    protected void goToPage(String url, ScrapContext context) {
         applyWait(driver);
         driver.get(url);
     }
 
     protected abstract String getFirstPageUrlWithParams(String url, ScrapContext context);
 
-    protected abstract int getNumberOfPages(WebDriver driver, ScrapContext context);
+    protected abstract int getNumberOfPages(ScrapContext context);
 
-    protected void loadPageAndProcess(WebDriver driver, List<Offer> productOffers, ScrapContext context) {
-        List<Element> offerElements = loadAllOffersTiles(driver, context);
-        parseOffers(driver, offerElements, productOffers, context);
+    protected void loadPageAndProcess(List<Offer> productOffers, ScrapContext context) {
+        List<Element> offerElements = loadAllOffersTiles(context);
+        parseOffers(offerElements, productOffers, context);
     }
 
-    protected void processPages(WebDriver driver, int pages, List<Offer> productOffers, String url, ScrapContext context) {
-        loadPageAndProcess(driver, productOffers, context);
+    protected void processPages(int pages, List<Offer> productOffers, String url, ScrapContext context) {
+        loadPageAndProcess(productOffers, context);
 
         for (int currentPage = 2; currentPage <= pages; currentPage++) {
             String processedUrl = getUrlWithParametersForPage(url, currentPage, context);
             LogUtils.debug(log, context, "Current Url: {}", processedUrl);
-            goToPage(driver, processedUrl, context);
-            loadPageAndProcess(driver, productOffers, context);
+            goToPage(processedUrl, context);
+            loadPageAndProcess(productOffers, context);
         }
     }
 
 
     protected abstract String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context);
 
-    protected abstract List<Element> loadAllOffersTiles(WebDriver driver, ScrapContext context);
+    protected abstract List<Element> loadAllOffersTiles(ScrapContext context);
 
-    protected void parseOffers(WebDriver driver, List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
+    protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context));
                 String href = sanitize(getOfferHref(offerElement, context));
-                String imgSrc = sanitize(getOfferImgHref(driver, offerElement, context));
+                String imgSrc = sanitize(getOfferImgHref(offerElement, context));
                 if (Strings.isNotBlank(imgSrc)) {
                     imgSrc = convertToBase64IfPossible(imgSrc);
                 }
@@ -298,7 +290,7 @@ public abstract class Scraper {
 
     protected abstract String getOfferHref(Element offer, ScrapContext context);
 
-    protected abstract String getOfferImgHref(WebDriver driver, Element offer, ScrapContext context);
+    protected abstract String getOfferImgHref(Element offer, ScrapContext context);
 
     protected abstract String getOfferName(Element offer, ScrapContext context);
 
