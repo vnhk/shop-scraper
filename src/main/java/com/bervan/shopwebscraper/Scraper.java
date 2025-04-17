@@ -51,7 +51,7 @@ public abstract class Scraper {
         List<Offer> offers = new ArrayList<>();
         options();
 
-        waitAndRunBrowserToPreventExceptionOnStart(config);
+//        waitAndRunBrowserToPreventExceptionOnStart(config);
 
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {

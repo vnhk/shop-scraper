@@ -99,7 +99,16 @@ public class MediaExpertScraper extends Scraper {
                 applyWait(newDriver);
                 newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
                 Document parse = Jsoup.parse(newDriver.getPageSource());
-                return parse.selectFirst(".product-gallery > .picture .spark-image").attr("src");
+                Element element = parse.selectFirst(".product-gallery > .picture .spark-image");
+                Element element1 = parse.selectFirst("meta[property='og:image']");
+                if (element != null) {
+                    return element.attr("src");
+                } else if (element1 != null) {
+                    return element1.attr("content");
+                } else {
+                    return "";
+                }
+
             }
         }
         return src;
