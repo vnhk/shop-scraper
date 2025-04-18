@@ -144,6 +144,7 @@ public abstract class Scraper {
                 .build();
 
         return executor.submit(() -> {
+            create();
             Callable<List<Offer>> callable = () -> {
                 String threadName = Thread.currentThread().getName();
                 context.setThread(threadName);
