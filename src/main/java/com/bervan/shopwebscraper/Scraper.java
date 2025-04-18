@@ -196,6 +196,9 @@ public abstract class Scraper {
     }
 
     public static void applyWait(WebDriver driver) {
+        if (driver == null) {
+            return;
+        }
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
         wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
     }
