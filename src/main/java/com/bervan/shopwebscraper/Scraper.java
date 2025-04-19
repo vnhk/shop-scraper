@@ -78,7 +78,7 @@ public abstract class Scraper {
         context.setThread(Thread.currentThread().getName());
         waitForOffers(offers, tasks, context);
 
-        LogUtils.info(log, context, "Processed {} offers.", offers.size());
+        LogUtils.info(log, context, "Processed %d offers.", offers.size());
         saveToFile(config, offers, context);
     }
 
@@ -120,12 +120,12 @@ public abstract class Scraper {
 
     private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks, ScrapContext context) {
         int i = 1;
-        LogUtils.info(log, context, "Tasks: {}", tasks.size());
+        LogUtils.info(log, context, "Tasks: %d", tasks.size());
 
         for (Future<List<Offer>> task : tasks) {
             try {
                 offers.addAll(task.get(30, TimeUnit.MINUTES));
-                LogUtils.info(log, context, "Task {} finished!", i);
+                LogUtils.info(log, context, "Task %d finished!", i);
                 i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 task.cancel(true);
