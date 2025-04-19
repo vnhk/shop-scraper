@@ -247,9 +247,9 @@ public abstract class Scraper {
         LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
         for (Element offerElement : offerElements) {
             try {
-                String offerName = sanitize(getOfferName(offerElement, context));
-                String href = sanitize(getOfferHref(offerElement, context));
-                if (!href.contains(context.getRoot().getBaseUrl()) && Strings.isNotBlank(href)) {
+                String offerName = sanitize(getOfferName(offerElement, context)).trim();
+                String href = sanitize(getOfferHref(offerElement, context)).trim();
+                if (!href.contains(context.getRoot().getBaseUrl()) && Strings.isNotBlank(href) && !href.contains("http")) {
                     String newHref = context.getRoot().getBaseUrl();
                     if (!(context.getRoot().getBaseUrl().endsWith("/") || href.startsWith("/"))) {
                         newHref += "/";
@@ -257,7 +257,7 @@ public abstract class Scraper {
                     newHref += href;
                     href = newHref;
                 }
-                String imgSrc = sanitize(getOfferImgHref(offerElement, context));
+                String imgSrc = sanitize(getOfferImgHref(offerElement, context)).trim();
                 if (Strings.isNotBlank(imgSrc)) {
                     imgSrc = convertToBase64IfPossible(imgSrc);
                 }
