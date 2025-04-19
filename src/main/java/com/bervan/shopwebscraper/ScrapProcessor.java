@@ -1,7 +1,6 @@
 package com.bervan.shopwebscraper;
 
 import com.google.gson.Gson;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -30,14 +29,13 @@ public class ScrapProcessor {
     }
 
     public void run(boolean scrapInMultiMode, String configFilePath, Integer hour, String... shops) {
-//        List<Future> tasks = new ArrayList<>();
+        List<Future> tasks = new ArrayList<>();
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
-//        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
-//        ExecutorService executor = Executors.newFixedThreadPool(1);
-//        if (!scrapInMultiMode) {
-//            executor = Executors.newFixedThreadPool(1);
-//        }
+        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
+        if (!scrapInMultiMode) {
+            executor = Executors.newFixedThreadPool(1);
+        }
 
         for (ConfigRoot root : roots) {
             String shopName = root.getShopName();
@@ -46,19 +44,18 @@ public class ScrapProcessor {
                 if (scraper == null) {
                     throw new RuntimeException("Scraper not found for given shop: " + shopName);
                 }
-                scraper.run(root, now, hour);
                 //threads
-//                tasks.add(executor.submit(() ->));
+                tasks.add(executor.submit(() -> scraper.run(root, now, hour)));
             }
         }
 
-//        for (Future task : tasks) {
-//            try {
-//                task.get(120, TimeUnit.MINUTES);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
+        for (Future task : tasks) {
+            try {
+                task.get(120, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
