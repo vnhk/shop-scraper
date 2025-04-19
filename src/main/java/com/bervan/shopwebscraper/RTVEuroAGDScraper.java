@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service("RTV Euro AGD")
@@ -39,6 +41,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
 //    @Override
 //    protected void options() {
+//        super.options();
 ////        options.addArguments("--blink-settings=imagesEnabled=false");
 //    }
 
@@ -47,27 +50,76 @@ public class RTVEuroAGDScraper extends Scraper {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
         Elements elementsByClass = parsed.getElementsByClass("progress-info");
-        if (elementsByClass.size() == 0) {
+        if (elementsByClass.isEmpty()) {
             return 1;
         }
         String info = elementsByClass.get(0).text().trim();
-        if (info.startsWith("Zobaczyłeś " + PAGE_SIZE + " z " + PAGE_SIZE)) {
-            //only one page
-            return 1;
-        } else if (info.startsWith("Zobaczyłeś " + PAGE_SIZE + " z ")) {
-            //more than one page
-            int allProducts = Integer.parseInt(info.split("Zobaczyłeś " + PAGE_SIZE + " z ")[1].split(" ")[0]);
-            int productsPerPage = Integer.parseInt(PAGE_SIZE);
-            Double ratio = allProducts * 1.0 / productsPerPage;
-            if (allProducts % productsPerPage == 0) {
-                return ratio.intValue();
+
+        Matcher matcher = Pattern.compile("Zobaczyłeś (\\d+) z (\\d+)").matcher(info);
+        if (matcher.find()) {
+            int pageSizeBeforeZ = Integer.parseInt(matcher.group(1));
+            int pageSizeAfterZ = Integer.parseInt(matcher.group(2));
+            if (pageSizeBeforeZ == pageSizeAfterZ) {
+                // only one page
+                return 1;
             } else {
-                return ratio.intValue() + 1;
+                // more than one page
+                int allProducts = pageSizeAfterZ;
+                int productsPerPage = pageSizeBeforeZ;
+                Double ratio = allProducts * 1.0 / productsPerPage;
+                if (allProducts % productsPerPage == 0) {
+                    return ratio.intValue();
+                } else {
+                    return ratio.intValue() + 1;
+                }
             }
         } else {
             //only one page
             return 1;
         }
+    }
+
+    @Override
+    protected void preSave(List<Offer> productOffers, ScrapContext context) {
+        // Extract names
+        List<String> names = productOffers.stream()
+                .map(offer -> offer.get("Name").toString())
+                .collect(Collectors.toList());
+
+        // Find common substrings
+        String commonSubstring = findCommonSubstring(names);
+
+        if (!commonSubstring.isEmpty()) {
+            System.out.println("Common substring found: " + commonSubstring);
+
+            // Update offer names, removing the common substring
+            for (Offer offer : productOffers) {
+                String name = offer.get("Name").toString();
+                name = name.replace(commonSubstring, "").trim();
+                offer.put("Name", name);
+            }
+        }
+    }
+
+    private String findCommonSubstring(List<String> strings) {
+        if (strings.isEmpty()) {
+            return "";
+        }
+
+        // Start with smallest string as a candidate for common substring
+        String reference = strings.get(0);
+        String longestCommonSubstring = "";
+
+        for (int i = 0; i < reference.length(); i++) {
+            for (int j = i + 4; j <= reference.length(); j++) {
+                String subStr = reference.substring(i, j);
+                if (strings.stream().allMatch(s -> s.contains(subStr)) && subStr.length() > longestCommonSubstring.length()) {
+                    longestCommonSubstring = subStr;
+                }
+            }
+        }
+
+        return longestCommonSubstring;
     }
 
 
@@ -94,9 +146,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
     private Elements loadOffers(WebDriver driver) {
         Document doc = Jsoup.parse(driver.getPageSource());
-        Elements offers = doc.getElementsByClass("product-list__product-box");
-        offers.addAll(doc.getElementsByClass("product-paginator__box-container--first"));
-        return offers;
+        return doc.getElementsByClass("product-list-results__product-box");
     }
 
     @Override
@@ -106,18 +156,18 @@ public class RTVEuroAGDScraper extends Scraper {
 
     @Override
     protected void processProductAdditionalAttributes(Element offerElement, Offer offer, ScrapContext context) {
-        Element attributes = offerElement.select(".box-medium__desc").first();
+        Element attributes = offerElement.select(".product-medium-box-content__desc").first();
         if (attributes != null) {
-            List<Element> items = attributes.select(".box-medium__specs-item");
+            List<Element> items = attributes.select(".technical-data__list-item");
             for (Element item : items) {
-                String attributeName = sanitize(item.select("span").get(0).text()
-                        .trim());
+                String attributeName = sanitize(item.text().trim());
                 String parsedAttributeName = attributeName;
-                if (attributeName.endsWith(":")) {
-                    parsedAttributeName = attributeName.substring(0, attributeName.length() - 1);
+                String attributeValues="";
+                if (attributeName.contains(":")) {
+                    parsedAttributeName = attributeName.split(":")[0].trim();
+                    attributeValues = attributeName.split(":")[1].trim();
                 }
-                String attributeValues = item.select("span").text().trim()
-                        .substring(attributeName.length());
+
                 if (!parsedAttributeName.isBlank()) {
                     offer.put(parsedAttributeName, Arrays.stream(attributeValues.split(", "))
                             .map(String::trim)
@@ -131,7 +181,7 @@ public class RTVEuroAGDScraper extends Scraper {
 
     @Override
     protected String getOfferPrice(Element offer, ScrapContext context) {
-        return offer.select(".box-medium__price .price-template__large--total")
+        return offer.select(".parted-price-total")
                 .text()
                 .replace(" ", "")
                 .trim();
@@ -139,16 +189,16 @@ public class RTVEuroAGDScraper extends Scraper {
 
     @Override
     protected String getOfferHref(Element offer, ScrapContext context) {
-        return getFirstIfFoundAttrByCssQuery(offer, ".box-medium__link", "href");
+        return getFirstIfFoundAttrByCssQuery(offer, ".product-medium-box-intro__link", "href");
     }
 
     @Override
     protected String getOfferImgHref(Element offer, ScrapContext context) {
-        return getFirstIfFoundAttrByCssQuery(offer, "div.box-medium__photo > img", "src");
+        return getFirstIfFoundAttrByCssQuery(offer, "img", "src");
     }
 
     @Override
     protected String getOfferName(Element offer, ScrapContext context) {
-        return getFirstIfFoundTextByCssQuery(offer, ".box-medium__link");
+        return getFirstIfFoundTextByCssQuery(offer, ".product-medium-box-intro__link");
     }
 }

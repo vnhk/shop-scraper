@@ -71,6 +71,11 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
+    protected void preSave(List<Offer> productOffers, ScrapContext context) {
+
+    }
+
+    @Override
     protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         return doc.getElementsByClass("offer");

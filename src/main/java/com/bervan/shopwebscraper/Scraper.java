@@ -170,6 +170,7 @@ public abstract class Scraper {
 
                     try {
                         if(!productOffers.isEmpty()) {
+                            preSave(productOffers, context);
                             LogUtils.info(log, context, "Saving to database...");
                             statServerService.save(productOffers);
                             LogUtils.info(log, context, "Saved to database...");
@@ -190,6 +191,7 @@ public abstract class Scraper {
                     newDriver.quit();
                     driver = null;
                     newDriver = null;
+                    create();
                 }
             };
             return retryer.call(callable);
@@ -223,6 +225,8 @@ public abstract class Scraper {
         parseOffers(offerElements, productOffers, context);
     }
 
+    protected abstract void preSave(List<Offer> productOffers, ScrapContext context);
+
     protected void processPages(int pages, List<Offer> productOffers, String url, ScrapContext context) {
         loadPageAndProcess(productOffers, context);
 
@@ -245,6 +249,14 @@ public abstract class Scraper {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context));
                 String href = sanitize(getOfferHref(offerElement, context));
+                if (!href.contains(context.getRoot().getBaseUrl()) && Strings.isNotBlank(href)) {
+                    String newHref = context.getRoot().getBaseUrl();
+                    if (!(context.getRoot().getBaseUrl().endsWith("/") || href.startsWith("/"))) {
+                        newHref += "/";
+                    }
+                    newHref += href;
+                    href = newHref;
+                }
                 String imgSrc = sanitize(getOfferImgHref(offerElement, context));
                 if (Strings.isNotBlank(imgSrc)) {
                     imgSrc = convertToBase64IfPossible(imgSrc);
@@ -281,7 +293,8 @@ public abstract class Scraper {
                 byte[] imageBytes = outputStream.toByteArray();
                 return Base64.getEncoder().encodeToString(imageBytes);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("Could not convert to base 64! " + imgSrc);
+                return imgSrc;
             }
         } else {
             return imgSrc;
@@ -301,7 +314,8 @@ public abstract class Scraper {
     protected String sanitize(String text) {
         return text.replace(" ", "")
                 .replace("\\u0027", "'")
-                .replace("\\u0026", "&");
+                .replace("\\u0026", "&")
+                .trim();
     }
 
     protected String getFirstIfFoundTextByCssQuery(Element offer, String cssQuery) {
