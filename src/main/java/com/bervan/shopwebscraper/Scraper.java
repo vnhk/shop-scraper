@@ -187,11 +187,11 @@ public abstract class Scraper {
                     LogUtils.error(log, context, "Could not parse products:", e);
                     throw new ProductScrapException("Could not parse products " + context.getProduct().getName() + "!", context.getProduct());
                 } finally {
-                    driver.quit();
-                    newDriver.quit();
-                    driver = null;
-                    newDriver = null;
-                    create();
+//                    driver.quit();
+//                    newDriver.quit();
+//                    driver = null;
+//                    newDriver = null;
+//                    create();
                 }
             };
             return retryer.call(callable);
