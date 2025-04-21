@@ -47,17 +47,35 @@ public abstract class Scraper {
         this.userAgents = userAgents;
     }
 
-    public synchronized void create() {
+    public synchronized void create(ConfigRoot config) {
         if (driver == null || newDriver == null) {
             options();
+            waitAndRunBrowserToPreventExceptionOnStart(config);
             driver = new ChromeDriver(options);
             newDriver = new ChromeDriver(options);
+
+        }
+    }
+
+    private void waitAndRunBrowserToPreventExceptionOnStart(ConfigRoot config) {
+        try {
+            ChromeDriver driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+            driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+            driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
+        } catch (Exception e) {
+            log.error("waitAndRunBrowserToPreventExceptionOnStart:", e);
         }
     }
 
     public void run(ConfigRoot config, Date scrapDate, Integer hour) {
         executor = Executors.newFixedThreadPool(getNThreadsForConcurrentProcessing());
-        create();
+        create(config);
         List<Offer> offers = new ArrayList<>();
         List<Future<List<Offer>>> tasks = new ArrayList<>();
         for (ConfigProduct product : config.getProducts()) {
@@ -145,7 +163,7 @@ public abstract class Scraper {
                 .build();
 
         return executor.submit(() -> {
-            create();
+            create(context.getRoot());
             Callable<List<Offer>> callable = () -> {
                 String threadName = Thread.currentThread().getName();
                 context.setThread(threadName);
