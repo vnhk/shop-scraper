@@ -91,6 +91,7 @@ public abstract class Scraper {
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
         options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
         options.addArguments("--ignore-ssl-errors=yes");
         options.addArguments("--ignore-certificate-errors");
     }
