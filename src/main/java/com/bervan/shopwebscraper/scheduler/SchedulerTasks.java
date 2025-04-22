@@ -37,14 +37,14 @@ public class SchedulerTasks {
         this.statServerService = statServerService;
     }
 
-//    @Scheduled(cron = "0 0 3 * * *")
-//    public void refreshView1() {
-//        try {
-//            statServerService.refreshViews();
-//        } catch (Exception e) {
-//            log.error("RefreshingViews: FAILED!", e);
-//        }
-//    }
+    @Scheduled(cron = "0 0 3 * * *")
+    public void refreshViews() {
+        try {
+            statServerService.refreshViews();
+        } catch (Exception e) {
+            log.error("RefreshingViews: FAILED!", e);
+        }
+    }
 //
 //    @Scheduled(cron = "0 0 * * * *")
 //    public void refreshFavorites() throws InterruptedException {

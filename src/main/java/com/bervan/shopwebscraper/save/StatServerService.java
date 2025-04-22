@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -35,16 +32,23 @@ public class StatServerService {
 //    @Autowired
 //    private RestTemplate restTemplate;
 
-//    public Set<String> refreshViews() throws SavingOffersToDBException {
-//        Set<String> res = new HashSet<>();
-//        try {
-//            refresh(res, "/products/refresh-materialized-views");
-//            res.addAll(refreshFavorites());
-//        } catch (Exception e) {
-//            throw new SavingOffersToDBException("Views could not be refreshed!", e);
-//        }
-//        return res;
-//    }
+    public Set<String> refreshViews() throws SavingOffersToDBException {
+        Set<String> res = new HashSet<>();
+        try {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("viewName", "HISTORICAL_LOW_PRICES");
+            sendProductMessage(new QueueMessage("RefreshViewQueueParam", data, apiKey));
+            data.put("viewName", "LOWER_THAN_HISTORICAL_LOW_PRICES");
+            sendProductMessage(new QueueMessage("RefreshViewQueueParam", data, apiKey));
+            data.put("viewName", "LOWER_THAN_AVG_FOR_LAST_MONTH");
+            sendProductMessage(new QueueMessage("RefreshViewQueueParam", data, apiKey));
+            data.put("viewName", "LOWER_THAN_AVG_FOR_LAST_X_MONTHS");
+            sendProductMessage(new QueueMessage("RefreshViewQueueParam", data, apiKey));
+        } catch (Exception e) {
+            throw new SavingOffersToDBException("Views could not be refreshed!", e);
+        }
+        return res;
+    }
 
 //    public Set<String> refreshFavorites() throws NoSuchAlgorithmException, KeyManagementException {
 //        Set<String> res = new HashSet<>();
