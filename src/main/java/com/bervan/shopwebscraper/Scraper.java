@@ -229,7 +229,7 @@ public abstract class Scraper {
             if (driver == null) {
                 return;
             }
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
         } catch (Exception e) {
             log.error("Could not 'applyWait', Exception: {}", e.getMessage());
