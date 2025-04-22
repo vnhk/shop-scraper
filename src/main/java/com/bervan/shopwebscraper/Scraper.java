@@ -235,11 +235,17 @@ public abstract class Scraper {
 
     protected void goToFirstPage(String url, ScrapContext context) {
         applyWait(driver);
+        if (driver == null) {
+            create(context.getRoot());
+        }
         driver.get(getFirstPageUrlWithParams(url, context));
     }
 
     protected void goToPage(String url, ScrapContext context) {
         applyWait(driver);
+        if (driver == null) {
+            create(context.getRoot());
+        }
         driver.get(url);
     }
 

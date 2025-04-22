@@ -101,6 +101,9 @@ public class MediaExpertScraper extends Scraper {
             src = getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
             if (src == null || src.isBlank()) {
                 applyWait(newDriver);
+                if (newDriver == null) {
+                    create(context.getRoot());
+                }
                 newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
                 Document parse = Jsoup.parse(newDriver.getPageSource());
                 Element element = parse.selectFirst(".product-gallery > .picture .spark-image");
