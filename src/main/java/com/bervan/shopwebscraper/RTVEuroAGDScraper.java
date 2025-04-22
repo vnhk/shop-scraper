@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service("RTV Euro AGD")
+@Scope("prototype")
 public class RTVEuroAGDScraper extends Scraper {
 
     private static final String PAGE_SIZE = "15";

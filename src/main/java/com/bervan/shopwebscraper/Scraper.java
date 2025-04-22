@@ -18,7 +18,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -29,7 +28,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @Slf4j
-@Component
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
     private ExecutorService executor;
@@ -48,12 +46,15 @@ public abstract class Scraper {
     }
 
     public synchronized void create(ConfigRoot config) {
-        if (driver == null || newDriver == null) {
+        try {
             options();
             waitAndRunBrowserToPreventExceptionOnStart(config);
             driver = new ChromeDriver(options);
             newDriver = new ChromeDriver(options);
-
+        } catch (Exception e) {
+            log.error("Could not execute 'create'! {}", e.getMessage());
+            driver = new ChromeDriver(options);
+            newDriver = new ChromeDriver(options);
         }
     }
 
@@ -68,8 +69,11 @@ public abstract class Scraper {
             driver = new ChromeDriver(options);
             driver.get(config.getBaseUrl());
             driver.quit();
+            driver = new ChromeDriver(options);
+            driver.get(config.getBaseUrl());
+            driver.quit();
         } catch (Exception e) {
-            log.error("waitAndRunBrowserToPreventExceptionOnStart:", e);
+            log.error("waitAndRunBrowserToPreventExceptionOnStart: EXCEPTION: {}", e.getMessage());
         }
     }
 
@@ -116,7 +120,7 @@ public abstract class Scraper {
 
     private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
         try {
-            if (offers.size() > 0) {
+            if (!offers.isEmpty()) {
                 String filenamePrefix = getFilenamePrefix(config);
                 LogUtils.info(log, context, "Saving to files...");
                 jsonService.save(offers, filenamePrefix);
@@ -148,7 +152,7 @@ public abstract class Scraper {
                 i++;
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 task.cancel(true);
-                throw new RuntimeException(e);
+                log.error("waitForOffers exception: {}", e.getMessage());
             }
         }
     }
@@ -158,59 +162,59 @@ public abstract class Scraper {
         Retryer<List<Offer>> retryer = RetryerBuilder.<List<Offer>>newBuilder()
                 .retryIfExceptionOfType(ProductScrapException.class)
                 .retryIfRuntimeException()
+                .retryIfException()
                 .withWaitStrategy(WaitStrategies.fixedWait(10, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
         return executor.submit(() -> {
-            create(context.getRoot());
+            ScrapContext newContext = new ScrapContext();
+            newContext.setProduct(context.getProduct());
+            newContext.setRoot(context.getRoot());
+            newContext.setThread(context.getThread());
+            newContext.setScrapDate(context.getScrapDate());
+            create(newContext.getRoot());
             Callable<List<Offer>> callable = () -> {
                 String threadName = Thread.currentThread().getName();
-                context.setThread(threadName);
+                newContext.setThread(threadName);
                 try {
-                    LogUtils.info(log, context, "Started processing products.");
+                    LogUtils.info(log, newContext, "Started processing products.");
                     List<Offer> productOffers = new ArrayList<>();
 
-                    String url = baseUrl + context.getProduct().getUrl();
-                    goToFirstPage(url, context);
-                    int pages = getNumberOfPages(context);
-                    processPages(pages, productOffers, url, context);
+                    String url = baseUrl + newContext.getProduct().getUrl();
+                    goToFirstPage(url, newContext);
+                    int pages = getNumberOfPages(newContext);
+                    processPages(pages, productOffers, url, newContext);
 
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                    String formattedDate = simpleDateFormat.format(context.getScrapDate());
+                    String formattedDate = simpleDateFormat.format(newContext.getScrapDate());
                     for (Offer offer : productOffers) {
-                        offer.put("Date", context.getScrapDate().getTime());
+                        offer.put("Date", newContext.getScrapDate().getTime());
                         offer.put("Formatted Date", formattedDate);
-                        offer.put("Product List Name", context.getProduct().getName());
-                        offer.put("Categories", context.getProduct().getCategories());
-                        offer.put("Product List Url", context.getProduct().getUrl());
-                        offer.put("Shop", context.getRoot().getShopName());
+                        offer.put("Product List Name", newContext.getProduct().getName());
+                        offer.put("Categories", newContext.getProduct().getCategories());
+                        offer.put("Product List Url", newContext.getProduct().getUrl());
+                        offer.put("Shop", newContext.getRoot().getShopName());
                     }
 
                     try {
                         if(!productOffers.isEmpty()) {
-                            preSave(productOffers, context);
-                            LogUtils.info(log, context, "Saving to database...");
+                            preSave(productOffers, newContext);
+                            LogUtils.info(log, newContext, "Saving to database...");
                             statServerService.save(productOffers);
-                            LogUtils.info(log, context, "Saved to database...");
+                            LogUtils.info(log, newContext, "Saved to database...");
                         } else {
-                            LogUtils.info(log, context, "No offers to save to the database");
+                            LogUtils.info(log, newContext, "No offers to save to the database");
                         }
 
                     } catch (SavingOffersToDBException e) {
-                        LogUtils.error(log, context, "Could not save to database:", e);
+                        LogUtils.error(log, newContext, "Could not save to database:", e);
                     }
 
                     return productOffers;
                 } catch (Exception e) {
-                    LogUtils.error(log, context, "Could not parse products:", e);
-                    throw new ProductScrapException("Could not parse products " + context.getProduct().getName() + "!", context.getProduct());
-                } finally {
-//                    driver.quit();
-//                    newDriver.quit();
-//                    driver = null;
-//                    newDriver = null;
-//                    create();
+                    LogUtils.error(log, newContext, "Could not parse products:", e);
+                    throw new ProductScrapException("Could not parse products " + newContext.getProduct().getName() + "!", newContext.getProduct());
                 }
             };
             return retryer.call(callable);
@@ -218,11 +222,15 @@ public abstract class Scraper {
     }
 
     public static void applyWait(WebDriver driver) {
-        if (driver == null) {
-            return;
+        try {
+            if (driver == null) {
+                return;
+            }
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+            wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+        } catch (Exception e) {
+            log.error("Could not 'applyWait', Exception: {}", e.getMessage());
         }
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
-        wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
     }
 
     protected void goToFirstPage(String url, ScrapContext context) {
@@ -294,6 +302,8 @@ public abstract class Scraper {
                 productOffers.add(offer);
             } catch (SkipProcessingException e) {
                 LogUtils.info(log, context, "Offer is skipped: " + e.getMessage());
+            } catch (Exception e) {
+                LogUtils.error(log, context, "Offer could not been parsed!", e);
             }
         }
     }
@@ -312,7 +322,7 @@ public abstract class Scraper {
                 byte[] imageBytes = outputStream.toByteArray();
                 return Base64.getEncoder().encodeToString(imageBytes);
             } catch (Exception e) {
-                log.error("Could not convert to base 64! " + imgSrc);
+                log.error("Could not convert to base 64! {}", imgSrc);
                 return imgSrc;
             }
         } else {
@@ -342,7 +352,7 @@ public abstract class Scraper {
         if (elements.first() == null) {
             return elements.text();
         }
-        return elements.first().text();
+        return Objects.requireNonNull(elements.first()).text();
     }
 
     protected String getFirstIfFoundAttrByCssQuery(Element offer, String cssQuery, String attr) {
@@ -350,6 +360,6 @@ public abstract class Scraper {
         if (elements.first() == null) {
             return elements.attr(attr);
         }
-        return elements.first().attr(attr);
+        return Objects.requireNonNull(elements.first()).attr(attr);
     }
 }
