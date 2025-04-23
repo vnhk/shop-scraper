@@ -95,21 +95,24 @@ public class MediaExpertScraper extends Scraper {
             src = getFirstIfFoundAttrByCssQuery(offer, "img.is-loaded", "src");
             if (src == null || src.isBlank()) {
                 applyWait(newDriver);
-                if (newDriver == null) {
-                    create(context.getRoot());
+                try {
+                    if (newDriver == null) {
+                        create(context.getRoot());
+                    }
+                    newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
+                    Document parse = Jsoup.parse(newDriver.getPageSource());
+                    Element element = parse.selectFirst(".product-gallery > .picture .spark-image");
+                    Element element1 = parse.selectFirst("meta[property='og:image']");
+                    if (element != null) {
+                        return element.attr("src");
+                    } else if (element1 != null) {
+                        return element1.attr("content");
+                    } else {
+                        return "";
+                    }
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
                 }
-                newDriver.get(context.getRoot().getBaseUrl() + offer.select(".name > a").attr("href"));
-                Document parse = Jsoup.parse(newDriver.getPageSource());
-                Element element = parse.selectFirst(".product-gallery > .picture .spark-image");
-                Element element1 = parse.selectFirst("meta[property='og:image']");
-                if (element != null) {
-                    return element.attr("src");
-                } else if (element1 != null) {
-                    return element1.attr("content");
-                } else {
-                    return "";
-                }
-
             }
         }
         return src;
