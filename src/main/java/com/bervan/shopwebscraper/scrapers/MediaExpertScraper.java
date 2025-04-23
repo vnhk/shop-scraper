@@ -1,8 +1,10 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.ScrapContext;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,16 +21,8 @@ import java.util.stream.Collectors;
 @Scope("prototype")
 public class MediaExpertScraper extends Scraper {
 
-    @Value("${MEDIA_EXPERT_N_THREADS:1}")
-    private final Integer N_THREADS = 1;
-
-    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService, @Value("#{'${USER_AGENTS}'.split(',,,,')}")  List<String> userAgents) {
-        super(jsonService, excelService, statServerService, userAgents);
-    }
-
-    @Override
-    protected int getNThreadsForConcurrentProcessing() {
-        return N_THREADS;
+    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, QueueService queueService, @Value("#{'${USER_AGENTS}'.split(',,,,')}")  List<String> userAgents) {
+        super(jsonService, excelService, queueService, userAgents);
     }
 
     @Override

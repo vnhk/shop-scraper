@@ -1,6 +1,7 @@
 package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.ScrapContext;
 import com.bervan.shstat.queue.QueueMessage;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -13,27 +14,18 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class StatServerService {
-//    @Value("${stat-server.host:http://localhost}")
-//    private String STAT_SERVER_HOST = "http://localhost";
-//
-//    @Value("${stat-server.port:8080}")
-//    private String STAT_SERVER_PORT = "8080";
-
+public class QueueService {
     @Value("${stat-server.apiKey}")
     private String apiKey;
 
     @Autowired
     private AmqpTemplate amqpTemplate;
 
-//    @Value("${send-to-queue:false}")
-//    private Boolean sendToQueue = false;
+    public void addScrapingToQueue(ScrapContext scrapContext) {
+        amqpTemplate.convertAndSend("SCRAPER_DIRECT_EXCHANGE", "SCRAPER_ROUTING_KEY", scrapContext);
+    }
 
-//    @Autowired
-//    private RestTemplate restTemplate;
-
-    public Set<String> refreshViews() throws SavingOffersToDBException {
-        Set<String> res = new HashSet<>();
+    public void refreshViews() throws SavingOffersToDBException {
         try {
             HashMap<String, String> data = new HashMap<>();
             data.put("viewName", "HISTORICAL_LOW_PRICES");
@@ -47,7 +39,6 @@ public class StatServerService {
         } catch (Exception e) {
             throw new SavingOffersToDBException("Views could not be refreshed!", e);
         }
-        return res;
     }
 
 //    public Set<String> refreshFavorites() throws NoSuchAlgorithmException, KeyManagementException {
@@ -81,40 +72,10 @@ public class StatServerService {
                 ArrayList<Offer> data = new ArrayList<>();
                 data.addAll(offerList);
                 sendProductMessage(new QueueMessage("AddProductsQueueParam", data, apiKey));
-//                Map result = getRestTemplate().postForObject(
-//                        getUrl(), requestData, Map.class);
-//                List<String> messages = (List) result.get("messages");
-//                if (!messages.isEmpty()) {
-//                    log.warn("Not all products have been saved due to the following reasons:");
-//                    for (String message : messages) {
-//                        log.warn("- {}", message);
-//                    }
-//                    res.addAll(messages);
-//                }
             }
         } catch (Exception e) {
             throw new SavingOffersToDBException("Saving to the queue failed!", e);
         }
         return res;
     }
-
-//    private RestTemplate getRestTemplate() throws NoSuchAlgorithmException, KeyManagementException {
-//        return restTemplate;
-//    }
-
-//    private String getUrl() {
-//        String url = getStatServerHost() + ":" + STAT_SERVER_PORT + "/products";
-//        if (sendToQueue) {
-//            url += "/async";
-//        }
-//        return url;
-//    }
-//
-//    private String getStatServerHost() {
-//        return STAT_SERVER_HOST.contains("http") ? STAT_SERVER_HOST : "http://" + STAT_SERVER_HOST;
-//    }
-
-//    public void setSendToQueue(Boolean sendToQueue) {
-//        this.sendToQueue = sendToQueue;
-//    }
 }

@@ -1,8 +1,7 @@
 package com.bervan.shopwebscraper.scheduler;
 
-import ch.qos.logback.core.testUtil.RandomUtil;
 import com.bervan.shopwebscraper.ScrapProcessor;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 public class SchedulerTasks {
 
     private final ScrapProcessor scrapProcessor;
-    private final StatServerService statServerService;
+    private final QueueService queueService;
     private final String pathToDriver;
 
     @PostConstruct
@@ -30,17 +29,17 @@ public class SchedulerTasks {
         }
     }
 
-    public SchedulerTasks(ScrapProcessor scrapProcessor, StatServerService statServerService,
+    public SchedulerTasks(ScrapProcessor scrapProcessor, QueueService queueService,
                           @Value("${path-to-driver}") String pathToDriver) {
         this.scrapProcessor = scrapProcessor;
         this.pathToDriver = pathToDriver;
-        this.statServerService = statServerService;
+        this.queueService = queueService;
     }
 
     @Scheduled(cron = "0 0 3 * * *")
     public void refreshViews() {
         try {
-            statServerService.refreshViews();
+            queueService.refreshViews();
         } catch (Exception e) {
             log.error("RefreshingViews: FAILED!", e);
         }
@@ -56,16 +55,13 @@ public class SchedulerTasks {
 //        }
 //    }
 
-    @Scheduled(cron = "0 * * * * *")
-    public void scrap() throws InterruptedException {
-        Thread.sleep(RandomUtil.getPositiveInt() % 15000);
-        log.info("Scraping: STARTED!");
+    @Scheduled(cron = "0 0 * * * *")
+    public void scrapAddToQueue() throws InterruptedException {
         try {
             LocalDateTime now = LocalDateTime.now();
-            scrapProcessor.run(true, "config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
-            log.info("Scraping: COMPLETED!");
+            scrapProcessor.addToQueue("config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
         } catch (Exception e) {
-            log.error("Scraping: FAILED!", e);
+            log.error("scrapAddToQueue: FAILED!", e);
         }
     }
 }

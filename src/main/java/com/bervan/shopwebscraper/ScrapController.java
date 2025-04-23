@@ -22,7 +22,7 @@ public class ScrapController {
     @CrossOrigin("*")
     public ResponseEntity<List<String>> scrap(@RequestParam String shopNames, @RequestParam(required = false) Integer hour) {
         String[] shops = shopNames.split(",");
-        scrapProcessor.run(true, "config.json", hour, shops);
+        scrapProcessor.addToQueue("config.json", hour, shops);
 
         return ResponseEntity.of(Optional.of(Arrays.asList("No messages configured yet...")));
     }

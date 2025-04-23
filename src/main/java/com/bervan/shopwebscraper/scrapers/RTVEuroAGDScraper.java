@@ -1,8 +1,10 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.ScrapContext;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,15 +27,9 @@ public class RTVEuroAGDScraper extends Scraper {
 
     private static final String PAGE_SIZE = "15";
 
-    public RTVEuroAGDScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+    public RTVEuroAGDScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                              @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
-        super(jsonService, excelService, statServerService, userAgents);
-    }
-
-    @Override
-    protected int getNThreadsForConcurrentProcessing() {
-        //concurrent processing for rtv euro agd is not possible
-        return 1;
+        super(jsonService, excelService, queueService, userAgents);
     }
 
     @Override

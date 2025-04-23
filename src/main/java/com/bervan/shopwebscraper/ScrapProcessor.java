@@ -1,7 +1,12 @@
 package com.bervan.shopwebscraper;
 
+import com.bervan.shopwebscraper.scrapers.Scraper;
+import com.github.rholder.retry.RetryException;
 import com.google.gson.Gson;
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -11,10 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class ScrapProcessor {
@@ -22,20 +24,17 @@ public class ScrapProcessor {
     private final ResourceLoader resourceLoader;
     @Value("${logs.path}")
     private String path = "";
+    private final Jackson2JsonMessageConverter messageConverter;
 
-    public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader) {
+    public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader, Jackson2JsonMessageConverter messageConverter) {
         this.scrapers = scrapers;
         this.resourceLoader = resourceLoader;
+        this.messageConverter = messageConverter;
     }
 
-    public void run(boolean scrapInMultiMode, String configFilePath, Integer hour, String... shops) {
-        List<Future> tasks = new ArrayList<>();
+    public void addToQueue(String configFilePath, Integer hour, String... shops) {
         Date now = new Date();
         List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
-        ExecutorService executor = Executors.newFixedThreadPool(roots.size());
-        if (!scrapInMultiMode) {
-            executor = Executors.newFixedThreadPool(1);
-        }
 
         for (ConfigRoot root : roots) {
             String shopName = root.getShopName();
@@ -44,18 +43,15 @@ public class ScrapProcessor {
                 if (scraper == null) {
                     throw new RuntimeException("Scraper not found for given shop: " + shopName);
                 }
-                //threads
-                tasks.add(executor.submit(() -> scraper.run(root, now, hour)));
+                scraper.addToQueue(root, now, hour);
             }
         }
+    }
 
-        for (Future task : tasks) {
-            try {
-                task.get(120, TimeUnit.MINUTES);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    @RabbitListener(queues = "SCRAPER_QUEUE", concurrency = "1")
+    public void processMessage(Message message) throws ExecutionException, RetryException {
+        ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
+        scrapers.get(scrapContext.getRoot().getShopName()).runOne(scrapContext);
     }
 
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {

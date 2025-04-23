@@ -1,8 +1,11 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.ScrapContext;
+import com.bervan.shopwebscraper.SkipProcessingException;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,17 +22,9 @@ import java.util.stream.Collectors;
 @Service("Morele")
 @Scope("prototype")
 public class MoreleScraper extends Scraper {
-    @Value("${MORELE_N_THREADS:1}")
-    private final Integer N_THREADS = 1;
-
-    public MoreleScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+    public MoreleScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                          @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
-        super(jsonService, excelService, statServerService, userAgents);
-    }
-
-    @Override
-    protected int getNThreadsForConcurrentProcessing() {
-        return N_THREADS;
+        super(jsonService, excelService, queueService, userAgents);
     }
 
     @Override

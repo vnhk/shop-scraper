@@ -2,7 +2,7 @@ package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 
 import java.io.File;
 import java.util.*;
@@ -24,7 +24,7 @@ public class ConsoleJsonLoaderStarter {
     }
 
     private static void loadDir(String dirName) {
-        StatServerService statServerService = new StatServerService();
+        QueueService queueService = new QueueService();
         JsonService service = new JsonService();
         File folder = new File("./" + dirName);
         Set<File> listOfFiles = Arrays.stream(Objects.requireNonNull(folder.listFiles()))
@@ -34,7 +34,7 @@ public class ConsoleJsonLoaderStarter {
             List<Offer> load = service.load("./" + dirName + "/" + file.getName());
             updateDate(load);
             try {
-                statServerService.save(load);
+                queueService.save(load);
             } catch (SavingOffersToDBException e) {
                 System.err.println(e.getMessage());
             }

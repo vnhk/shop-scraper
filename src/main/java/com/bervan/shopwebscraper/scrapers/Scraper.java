@@ -1,14 +1,12 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shopwebscraper.scrapers;
 
 import ch.qos.logback.core.testUtil.RandomUtil;
+import com.bervan.shopwebscraper.*;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
+import com.bervan.shopwebscraper.save.QueueService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
-import com.bervan.shopwebscraper.save.StatServerService;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
+import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.nodes.Element;
@@ -30,18 +28,19 @@ import java.util.concurrent.*;
 @Slf4j
 public abstract class Scraper {
     protected final ChromeOptions options = new ChromeOptions();
-    private ExecutorService executor;
+    //    private ExecutorService executor;
+    //no threads better to add new device and run it again with different config/or read from the same queue
     protected WebDriver driver;
     protected WebDriver newDriver;
     private final JsonService jsonService;
     private final ExcelService excelService;
-    private final StatServerService statServerService;
+    private final QueueService queueService;
     private final List<String> userAgents;
 
-    public Scraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService, List<String> userAgents) {
+    public Scraper(JsonService jsonService, ExcelService excelService, QueueService queueService, List<String> userAgents) {
         this.jsonService = jsonService;
         this.excelService = excelService;
-        this.statServerService = statServerService;
+        this.queueService = queueService;
         this.userAgents = userAgents;
     }
 
@@ -77,11 +76,7 @@ public abstract class Scraper {
         }
     }
 
-    public void run(ConfigRoot config, Date scrapDate, Integer hour) {
-        executor = Executors.newFixedThreadPool(getNThreadsForConcurrentProcessing());
-        create(config);
-        List<Offer> offers = new ArrayList<>();
-        List<Future<List<Offer>>> tasks = new ArrayList<>();
+    public void addToQueue(ConfigRoot config, Date scrapDate, Integer hour) {
         for (ConfigProduct product : config.getProducts()) {
             if (!product.getScrapTime().getHours().equals(hour)) {
                 continue;
@@ -90,21 +85,20 @@ public abstract class Scraper {
             context.setRoot(config);
             context.setProduct(product);
             context.setScrapDate(scrapDate);
-            Future<List<Offer>> offerTasks = processProduct(context);
-            tasks.add(offerTasks);
+
+            queueService.addScrapingToQueue(context);
         }
-
-        ScrapContext context = new ScrapContext();
-        context.setRoot(config);
-        context.setScrapDate(scrapDate);
-        context.setThread(Thread.currentThread().getName());
-        waitForOffers(offers, tasks, context);
-
-        LogUtils.info(log, context, "Processed %d offers.", offers.size());
-        saveToFile(config, offers, context);
     }
 
-    protected abstract int getNThreadsForConcurrentProcessing();
+    public void runOne(ScrapContext context) throws ExecutionException, RetryException {
+        context.setThread(Thread.currentThread().getName());
+
+        create(context.getRoot());
+        List<Offer> offers = processProduct(context);
+
+        LogUtils.info(log, context, "Processed %d offers.", offers.size());
+        saveToFile(context.getRoot(), offers, context);
+    }
 
     protected void options() {
 //        options.addArguments("--blink-settings=imagesEnabled=false");
@@ -160,7 +154,7 @@ public abstract class Scraper {
 
     }
 
-    private Future<List<Offer>> processProduct(ScrapContext context) {
+    private List<Offer> processProduct(ScrapContext context) throws ExecutionException, RetryException {
         String baseUrl = context.getRoot().getBaseUrl();
         Retryer<List<Offer>> retryer = RetryerBuilder.<List<Offer>>newBuilder()
                 .retryIfExceptionOfType(ProductScrapException.class)
@@ -170,7 +164,6 @@ public abstract class Scraper {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                 .build();
 
-        return executor.submit(() -> {
             ScrapContext newContext = new ScrapContext();
             newContext.setProduct(context.getProduct());
             newContext.setRoot(context.getRoot());
@@ -204,7 +197,7 @@ public abstract class Scraper {
                         if(!productOffers.isEmpty()) {
                             preSave(productOffers, newContext);
                             LogUtils.info(log, newContext, "Saving to database...");
-                            statServerService.save(productOffers);
+                            queueService.save(productOffers);
                             LogUtils.info(log, newContext, "Saved to database...");
                         } else {
                             LogUtils.info(log, newContext, "No offers to save to the database");
@@ -221,7 +214,6 @@ public abstract class Scraper {
                 }
             };
             return retryer.call(callable);
-        });
     }
 
     public static void applyWait(WebDriver driver) {

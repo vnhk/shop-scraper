@@ -1,8 +1,11 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.ConfigRoot;
+import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.ScrapContext;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
-import com.bervan.shopwebscraper.save.StatServerService;
+import com.bervan.shopwebscraper.save.QueueService;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,18 +26,13 @@ public class MediaMarktScraper extends Scraper {
     private final String PAGE_SIZE = "50";
 
     @Override
-    public void run(ConfigRoot config, Date scrapDate, Integer hour) {
+    public void addToQueue(ConfigRoot config, Date scrapDate, Integer hour) {
         System.err.println("Not supported... yet....");
     }
 
-    @Override
-    protected int getNThreadsForConcurrentProcessing() {
-        return 1;
-    }
-
-    public MediaMarktScraper(JsonService jsonService, ExcelService excelService, StatServerService statServerService,
+    public MediaMarktScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                              @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
-        super(jsonService, excelService, statServerService, userAgents);
+        super(jsonService, excelService, queueService, userAgents);
     }
 
     @Override
