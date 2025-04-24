@@ -86,6 +86,7 @@ public abstract class Scraper {
             context.setProduct(product);
             context.setScrapDate(scrapDate);
 
+            log.info("Adding scrapping request to queue: {} - {}", product, config.getShopName());
             queueService.addScrapingToQueue(context);
         }
     }
