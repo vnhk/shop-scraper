@@ -6,7 +6,6 @@ import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
-import com.github.rholder.retry.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.nodes.Element;
@@ -23,7 +22,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.*;
 
 @Slf4j
 public abstract class Scraper {
@@ -91,7 +89,7 @@ public abstract class Scraper {
         }
     }
 
-    public void runOne(ScrapContext context) throws ExecutionException, RetryException {
+    public void runOne(ScrapContext context) {
         context.setThread(Thread.currentThread().getName());
 
         create(context.getRoot());
@@ -136,44 +134,14 @@ public abstract class Scraper {
         return "products_shop_scrap_" + shopName + "-";
     }
 
-    private void waitForOffers(List<Offer> offers, List<Future<List<Offer>>> tasks, ScrapContext context) {
-        int i = 1;
-        if (!tasks.isEmpty()) {
-            LogUtils.info(log, context, "Tasks: %d", tasks.size());
-            for (Future<List<Offer>> task : tasks) {
-                try {
-                    offers.addAll(task.get(30, TimeUnit.MINUTES));
-                    LogUtils.info(log, context, "Task %d finished!", i);
-                    i++;
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    task.cancel(true);
-                    log.error("waitForOffers exception: {}", e.getMessage());
-                }
-            }
-        }
-
-
-    }
-
-    private List<Offer> processProduct(ScrapContext context) throws ExecutionException, RetryException {
+    private List<Offer> processProduct(ScrapContext context) {
         String baseUrl = context.getRoot().getBaseUrl();
-        Retryer<List<Offer>> retryer = RetryerBuilder.<List<Offer>>newBuilder()
-                .retryIfExceptionOfType(ProductScrapException.class)
-                .retryIfRuntimeException()
-                .retryIfException()
-                .withWaitStrategy(WaitStrategies.fixedWait(10, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-                .build();
-
             ScrapContext newContext = new ScrapContext();
             newContext.setProduct(context.getProduct());
             newContext.setRoot(context.getRoot());
             newContext.setThread(context.getThread());
             newContext.setScrapDate(context.getScrapDate());
             create(newContext.getRoot());
-            Callable<List<Offer>> callable = () -> {
-                String threadName = Thread.currentThread().getName();
-                newContext.setThread(threadName);
                 try {
                     LogUtils.info(log, newContext, "Started processing products.");
                     List<Offer> productOffers = new ArrayList<>();
@@ -183,38 +151,11 @@ public abstract class Scraper {
                     int pages = getNumberOfPages(newContext);
                     processPages(pages, productOffers, url, newContext);
 
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                    String formattedDate = simpleDateFormat.format(newContext.getScrapDate());
-                    for (Offer offer : productOffers) {
-                        offer.put("Date", newContext.getScrapDate().getTime());
-                        offer.put("Formatted Date", formattedDate);
-                        offer.put("Product List Name", newContext.getProduct().getName());
-                        offer.put("Categories", newContext.getProduct().getCategories());
-                        offer.put("Product List Url", newContext.getProduct().getUrl());
-                        offer.put("Shop", newContext.getRoot().getShopName());
-                    }
-
-                    try {
-                        if(!productOffers.isEmpty()) {
-                            preSave(productOffers, newContext);
-                            LogUtils.info(log, newContext, "Saving to database...");
-                            queueService.save(productOffers);
-                            LogUtils.info(log, newContext, "Saved to database...");
-                        } else {
-                            LogUtils.info(log, newContext, "No offers to save to the database");
-                        }
-
-                    } catch (SavingOffersToDBException e) {
-                        LogUtils.error(log, newContext, "Could not save to database:", e);
-                    }
-
                     return productOffers;
                 } catch (Exception e) {
                     LogUtils.error(log, newContext, "Could not parse products:", e);
-                    throw new ProductScrapException("Could not parse products " + newContext.getProduct().getName() + "!", newContext.getProduct());
                 }
-            };
-            return retryer.call(callable);
+        return new ArrayList<>();
     }
 
     public static void applyWait(WebDriver driver) {
@@ -249,9 +190,37 @@ public abstract class Scraper {
 
     protected abstract int getNumberOfPages(ScrapContext context);
 
-    protected void loadPageAndProcess(List<Offer> productOffers, ScrapContext context) {
+    protected void loadPageAndProcess(List<Offer> allProductOffers, ScrapContext context) {
+        List<Offer> productOffers = new ArrayList<>();
         List<Element> offerElements = loadAllOffersTiles(context);
         parseOffers(offerElements, productOffers, context);
+        allProductOffers.addAll(productOffers);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String formattedDate = simpleDateFormat.format(context.getScrapDate());
+        for (Offer offer : productOffers) {
+            offer.put("Date", context.getScrapDate().getTime());
+            offer.put("Formatted Date", formattedDate);
+            offer.put("Product List Name", context.getProduct().getName());
+            offer.put("Categories", context.getProduct().getCategories());
+            offer.put("Product List Url", context.getProduct().getUrl());
+            offer.put("Shop", context.getRoot().getShopName());
+        }
+
+        try {
+            if (!productOffers.isEmpty()) {
+                preSave(productOffers, context);
+                LogUtils.info(log, context, "Saving" + productOffers.size() + "  to database...");
+                queueService.save(productOffers);
+                LogUtils.info(log, context, "Saved " + productOffers.size() + " context to database...");
+            } else {
+                LogUtils.info(log, context, "No offers to save to the database");
+            }
+
+        } catch (SavingOffersToDBException e) {
+            LogUtils.error(log, context, "Could not save to database:", e);
+        }
+
     }
 
     protected abstract void preSave(List<Offer> productOffers, ScrapContext context);

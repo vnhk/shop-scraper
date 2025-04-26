@@ -1,7 +1,6 @@
 package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.scrapers.Scraper;
-import com.github.rholder.retry.RetryException;
 import com.google.gson.Gson;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.amqp.core.Message;
@@ -16,7 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 
 @Service
 public class ScrapProcessor {
@@ -49,11 +48,24 @@ public class ScrapProcessor {
     }
 
     @RabbitListener(queues = "SCRAPER_QUEUE", concurrency = "1")
-    public void processMessage(Message message) throws ExecutionException, RetryException {
+    public void processMessage(Message message) throws Exception {
         ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
-        scrapers.get(scrapContext.getRoot().getShopName()).runOne(scrapContext);
-    }
+        String shopName = scrapContext.getRoot().getShopName();
 
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            scrapers.get(shopName).runOne(scrapContext);
+        });
+
+        try {
+            future.get(1, TimeUnit.HOURS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new RuntimeException("Scraping took too long and was cancelled", e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
         Resource resource = resourceLoader.getResource("classpath:" + configFilePath);
         Gson gson = new Gson();
