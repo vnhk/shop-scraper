@@ -5,9 +5,8 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import com.bervan.logging.LogMessage;
+import com.bervan.shopwebscraper.save.QueueService;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
@@ -17,11 +16,11 @@ import java.time.LocalDateTime;
 @Component
 public class QueueAppender extends AppenderBase<ILoggingEvent> implements SmartLifecycle {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final QueueService queueService;
     private final String applicationName;
 
-    public QueueAppender(RabbitTemplate rabbitTemplate, @Value("${spring.application.name}") String applicationName) {
-        this.rabbitTemplate = rabbitTemplate;
+    public QueueAppender(QueueService queueService, @Value("${spring.application.name}") String applicationName) {
+        this.queueService = queueService;
         this.applicationName = applicationName;
     }
 
@@ -32,7 +31,7 @@ public class QueueAppender extends AppenderBase<ILoggingEvent> implements SmartL
 
     @Override
     protected void append(ILoggingEvent eventObject) {
-        if (rabbitTemplate == null || applicationName == null) {
+        if (queueService == null || applicationName == null) {
             return;
         }
         LogMessage logMessage;
@@ -61,7 +60,7 @@ public class QueueAppender extends AppenderBase<ILoggingEvent> implements SmartL
 
 
         try {
-            rabbitTemplate.convertAndSend("LOGS_DIRECT_EXCHANGE", "LOGS_ROUTING_KEY", logMessage);
+            queueService.addLogToQueue(logMessage);
         } catch (Exception e) {
             addError("Failed to send log to RabbitMQ", e);
         }

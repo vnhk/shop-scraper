@@ -1,5 +1,6 @@
 package com.bervan.shopwebscraper.save;
 
+import com.bervan.shopwebscraper.logging.LogMessage;
 import com.bervan.shopwebscraper.Offer;
 import com.bervan.shopwebscraper.ScrapContext;
 import com.bervan.shstat.queue.QueueMessage;
@@ -78,4 +79,9 @@ public class QueueService {
         }
         return res;
     }
+
+    public void addLogToQueue(LogMessage logMessage) {
+        amqpTemplate.convertAndSend("LOGS_DIRECT_EXCHANGE", "LOGS_ROUTING_KEY", logMessage);
+    }
 }
+
