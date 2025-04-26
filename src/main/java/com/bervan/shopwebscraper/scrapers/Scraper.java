@@ -46,10 +46,25 @@ public abstract class Scraper {
         try {
             options();
             waitAndRunBrowserToPreventExceptionOnStart(config);
+            if (driver != null) {
+                driver.quit();
+            }
+
+            if (newDriver != null) {
+                newDriver.quit();
+            }
+
             driver = new ChromeDriver(options);
             newDriver = new ChromeDriver(options);
         } catch (Exception e) {
             log.error("Could not execute 'create'! {}", e.getMessage());
+            if (driver != null) {
+                driver.quit();
+            }
+
+            if (newDriver != null) {
+                newDriver.quit();
+            }
             driver = new ChromeDriver(options);
             newDriver = new ChromeDriver(options);
         }
@@ -90,13 +105,23 @@ public abstract class Scraper {
     }
 
     public void runOne(ScrapContext context) {
-        context.setThread(Thread.currentThread().getName());
+        try {
+            context.setThread(Thread.currentThread().getName());
 
-        create(context.getRoot());
-        List<Offer> offers = processProduct(context);
+            create(context.getRoot());
+            List<Offer> offers = processProduct(context);
 
-        LogUtils.info(log, context, "Processed %d offers.", offers.size());
-        saveToFile(context.getRoot(), offers, context);
+            LogUtils.info(log, context, "Processed %d offers.", offers.size());
+            saveToFile(context.getRoot(), offers, context);
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
+
+            if (newDriver != null) {
+                newDriver.quit();
+            }
+        }
     }
 
     protected void options() {
