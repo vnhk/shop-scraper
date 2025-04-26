@@ -15,6 +15,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueueConfig {
     @Bean
+    public Queue logsQueue() {
+        return new Queue("LOGS_QUEUE", true);
+    }
+
+    @Bean
+    public DirectExchange logsDirectExchange() {
+        return new DirectExchange("LOGS_DIRECT_EXCHANGE");
+    }
+
+    @Bean
+    public Binding logsQueueBinding(Queue logsQueue, DirectExchange logsDirectExchange) {
+        return BindingBuilder.bind(logsQueue).to(logsDirectExchange).with("LOGS_ROUTING_KEY");
+    }
+
+    @Bean
     public Queue productsQueue() {
         return new Queue("PRODUCTS_QUEUE", true);
     }
