@@ -73,11 +73,12 @@ public class ScrapProcessor {
                 future.get(1, TimeUnit.HOURS);
             } catch (TimeoutException e) {
                 future.cancel(true);
-                throw new RuntimeException("Scraping took too long and was cancelled", e);
+                log.error("Scraping took too long and was cancelled", e);
             }
 
         } catch (Exception e) {
             log.error("Failed to process product!", e);
+            log.error(e.getMessage());
         } finally {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }

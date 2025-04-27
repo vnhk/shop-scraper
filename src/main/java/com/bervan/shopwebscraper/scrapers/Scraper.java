@@ -106,6 +106,7 @@ public abstract class Scraper {
 
     public void runOne(ScrapContext context) {
         try {
+            LogUtils.info(log, context, "Started runOne!");
             context.setThread(Thread.currentThread().getName());
 
             create(context.getRoot());
