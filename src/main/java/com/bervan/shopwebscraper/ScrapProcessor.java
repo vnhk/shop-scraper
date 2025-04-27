@@ -2,30 +2,42 @@ package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.scrapers.Scraper;
 import com.google.gson.Gson;
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
+@Slf4j
 public class ScrapProcessor {
+    @Autowired
+    private TaskExecutor taskExecutor;
+
     private final Map<String, Scraper> scrapers;
     private final ResourceLoader resourceLoader;
     @Value("${logs.path}")
     private String path = "";
     private final Jackson2JsonMessageConverter messageConverter;
 
-    public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader, Jackson2JsonMessageConverter messageConverter) {
+    public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader,
+                          Jackson2JsonMessageConverter messageConverter) {
         this.scrapers = scrapers;
         this.resourceLoader = resourceLoader;
         this.messageConverter = messageConverter;
@@ -47,25 +59,30 @@ public class ScrapProcessor {
         }
     }
 
-    @RabbitListener(queues = "SCRAPER_QUEUE", concurrency = "1")
-    public void processMessage(Message message) throws Exception {
-        ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
-        String shopName = scrapContext.getRoot().getShopName();
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<?> future = executor.submit(() -> {
-            scrapers.get(shopName).runOne(scrapContext);
-        });
-
+    @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL")
+    public void processMessage(Message message, Channel channel) throws IOException {
         try {
-            future.get(1, TimeUnit.HOURS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            throw new RuntimeException("Scraping took too long and was cancelled", e);
+            ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
+            String shopName = scrapContext.getRoot().getShopName();
+
+            Future<?> future = ((ExecutorService) taskExecutor).submit(() -> {
+                scrapers.get(shopName).runOne(scrapContext);
+            });
+
+            try {
+                future.get(1, TimeUnit.HOURS);
+            } catch (TimeoutException e) {
+                future.cancel(true);
+                throw new RuntimeException("Scraping took too long and was cancelled", e);
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to process product!", e);
         } finally {
-            executor.shutdownNow();
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         }
     }
+
     private List<ConfigRoot> loadProductsFromConfig(String configFilePath) {
         Resource resource = resourceLoader.getResource("classpath:" + configFilePath);
         Gson gson = new Gson();
