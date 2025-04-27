@@ -8,30 +8,23 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 @Service
 @Slf4j
 public class ScrapProcessor {
-    @Autowired
-    private TaskExecutor taskExecutor;
-
     private final Map<String, Scraper> scrapers;
     private final ResourceLoader resourceLoader;
+    private final ExecutorService executor;
     @Value("${logs.path}")
     private String path = "";
     private final Jackson2JsonMessageConverter messageConverter;
@@ -41,6 +34,8 @@ public class ScrapProcessor {
         this.scrapers = scrapers;
         this.resourceLoader = resourceLoader;
         this.messageConverter = messageConverter;
+        this.executor = Executors.newSingleThreadExecutor();
+
     }
 
     public void addToQueue(String configFilePath, Integer hour, String... shops) {
@@ -59,13 +54,13 @@ public class ScrapProcessor {
         }
     }
 
-    @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL")
+    @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL", concurrency = "2")
     public void processMessage(Message message, Channel channel) throws IOException {
         try {
             ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
             String shopName = scrapContext.getRoot().getShopName();
 
-            Future<?> future = ((ExecutorService) taskExecutor).submit(() -> {
+            Future<?> future = executor.submit(() -> {
                 scrapers.get(shopName).runOne(scrapContext);
             });
 
