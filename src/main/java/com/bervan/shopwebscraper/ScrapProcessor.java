@@ -58,6 +58,7 @@ public class ScrapProcessor {
     public void processMessage(Message message, Channel channel) throws IOException {
         try {
             ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
+            LogUtils.info(log, scrapContext, "Scraping process message started.");
             String shopName = scrapContext.getRoot().getShopName();
 
             Future<?> future = executor.submit(() -> {
@@ -66,16 +67,18 @@ public class ScrapProcessor {
 
             try {
                 future.get(1, TimeUnit.HOURS);
+                LogUtils.info(log, scrapContext, "Scraping process message ended without problems.");
             } catch (TimeoutException e) {
                 future.cancel(true);
-                log.error("Scraping took too long and was cancelled", e);
+                LogUtils.info(log, scrapContext, "Scraping process message took too long and was cancelled", e);
             }
-
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Failed to process product!", e);
             log.error(e.getMessage());
         } finally {
+            log.info("Scraping manual ack");
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            log.info("Scraping manual ack - finished!");
         }
     }
 
