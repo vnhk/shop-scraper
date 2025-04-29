@@ -54,7 +54,7 @@ public class ScrapProcessor {
         }
     }
 
-    @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL", concurrency = "2")
+    @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL", concurrency = "4")
     public void processMessage(Message message, Channel channel) throws IOException {
         try {
             ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
