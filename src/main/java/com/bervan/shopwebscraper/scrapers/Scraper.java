@@ -293,6 +293,10 @@ public abstract class Scraper {
                     }
                 }
 
+                if (base64ImagesFailed > 3) {
+                    LogUtils.warn(log, context, "Img convertion to base64 stopped for current page!");
+                }
+
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
 
                 Offer offer = new Offer();

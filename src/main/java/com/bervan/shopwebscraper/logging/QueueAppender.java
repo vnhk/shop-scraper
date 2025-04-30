@@ -22,10 +22,12 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
 
     private final RabbitTemplate rabbitTemplate;
     private final String applicationName;
+    private final Boolean enabled;
 
-    public QueueAppender(RabbitTemplate rabbitTemplate, @Value("${spring.application.name}") String applicationName) {
+    public QueueAppender(RabbitTemplate rabbitTemplate, @Value("${spring.application.name}") String applicationName, @Value("${queue-appender-enabled}") Boolean enabled) {
         this.rabbitTemplate = rabbitTemplate;
         this.applicationName = applicationName;
+        this.enabled = enabled;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
 
     @Override
     protected void append(ILoggingEvent eventObject) {
-        if (rabbitTemplate == null || applicationName == null) {
+        if (rabbitTemplate == null || applicationName == null || !enabled) {
             return;
         }
 

@@ -15,6 +15,16 @@ public class LogUtils {
                 stringFormattedMessage.getFormattedMessage());
     }
 
+    public static void warn(Logger log, ScrapContext scrapContext, String messageFormat, Object... params) {
+        StringFormattedMessage stringFormattedMessage = new StringFormattedMessage(messageFormat, params);
+        log.warn("{} : {} : {} - {} - {}",
+                scrapContext.getRoot().getShopName(),
+                getProductName(scrapContext),
+                scrapContext.getScrapDate(),
+                scrapContext.getThread(),
+                stringFormattedMessage.getFormattedMessage());
+    }
+
     private static String getProductName(ScrapContext scrapContext) {
         if (scrapContext.getProduct() == null || scrapContext.getProduct().getName() == null || scrapContext.getProduct().getName().isBlank()) {
             return "_";
