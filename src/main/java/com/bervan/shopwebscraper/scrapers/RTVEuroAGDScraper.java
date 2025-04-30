@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Scope("prototype")
 public class RTVEuroAGDScraper extends Scraper {
 
-    private static final String PAGE_SIZE = "15";
+    private static final String PAGE_SIZE = "20";
 
     public RTVEuroAGDScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                              @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {

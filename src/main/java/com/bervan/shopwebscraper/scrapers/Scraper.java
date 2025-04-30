@@ -18,7 +18,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -271,6 +270,7 @@ public abstract class Scraper {
 
     protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
+        int base64ImagesFailed = 0;
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context)).trim();
@@ -284,8 +284,13 @@ public abstract class Scraper {
                     href = newHref;
                 }
                 String imgSrc = sanitize(getOfferImgHref(offerElement, context)).trim();
-                if (Strings.isNotBlank(imgSrc)) {
+                if (Strings.isNotBlank(imgSrc) && base64ImagesFailed <= 3) {
                     imgSrc = convertToBase64IfPossible(imgSrc);
+                    if (imgSrc.startsWith("http")) {
+                        base64ImagesFailed++;
+                    } else {
+                        base64ImagesFailed = 0;
+                    }
                 }
 
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
