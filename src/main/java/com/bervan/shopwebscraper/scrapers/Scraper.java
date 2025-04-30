@@ -18,7 +18,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -307,21 +309,30 @@ public abstract class Scraper {
 
     private String convertToBase64IfPossible(String imgSrc) {
         if (imgSrc.startsWith("http")) {
-            try (InputStream inputStream = new URL(imgSrc).openStream();
-                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            try {
+                URL url = new URL(imgSrc);
+                URLConnection conn = url.openConnection();
+                conn.setReadTimeout(5000);
+                conn.setConnectTimeout(3000);
+                try (InputStream inputStream = conn.getInputStream();
+                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
 
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
+                    byte[] imageBytes = outputStream.toByteArray();
+                    return Base64.getEncoder().encodeToString(imageBytes);
+                } catch (Exception e2) {
+                    log.error("Could not convert to base 64! {}: {}", imgSrc, e2.getMessage());
+                    return imgSrc;
                 }
-
-                byte[] imageBytes = outputStream.toByteArray();
-                return Base64.getEncoder().encodeToString(imageBytes);
             } catch (Exception e) {
                 log.error("Could not convert to base 64! {}", imgSrc);
                 return imgSrc;
             }
+
         } else {
             return imgSrc;
         }
