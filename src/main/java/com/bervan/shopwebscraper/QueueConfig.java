@@ -83,6 +83,11 @@ public class QueueConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(jsonMessageConverter());
+        factory.setPrefetchCount(2);
+        factory.setConcurrentConsumers(2);
+        factory.setMaxConcurrentConsumers(4);
+        factory.setDefaultRequeueRejected(false);
+
         return factory;
     }
 }
