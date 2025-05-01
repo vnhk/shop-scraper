@@ -271,6 +271,7 @@ public abstract class Scraper {
     protected void parseOffers(List<Element> offerElements, List<Offer> productOffers, ScrapContext context) {
         LogUtils.info(log, context, "Found " + offerElements.size() + " to process.");
         int base64ImagesFailed = 0;
+        boolean messageImgStoppedFlag = true;
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context)).trim();
@@ -293,8 +294,9 @@ public abstract class Scraper {
                     }
                 }
 
-                if (base64ImagesFailed > 3) {
+                if (base64ImagesFailed > 3 && messageImgStoppedFlag) {
                     LogUtils.warn(log, context, "Img convertion to base64 stopped for current page!");
+                    messageImgStoppedFlag = false;
                 }
 
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
