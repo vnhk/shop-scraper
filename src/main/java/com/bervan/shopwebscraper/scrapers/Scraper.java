@@ -275,6 +275,16 @@ public abstract class Scraper {
         for (Element offerElement : offerElements) {
             try {
                 String offerName = sanitize(getOfferName(offerElement, context)).trim();
+
+                if (offerName.length() < 3) {
+                    LogUtils.warn(log, context, "Offer Name is probably incorrect, has less than 3 characters: {}", offerName);
+                    LogUtils.warn(log, context, "OFFER SKIPPED");
+                    continue;
+                } else if (offerName.length() > 300) {
+                    LogUtils.warn(log, context, "Offer Name is probably incorrect, has more than 300 characters: {}", offerName);
+                    LogUtils.warn(log, context, "OFFER SKIPPED");
+                }
+
                 String href = sanitize(getOfferHref(offerElement, context)).trim();
                 if (!href.contains(context.getRoot().getBaseUrl()) && Strings.isNotBlank(href) && !href.contains("http")) {
                     String newHref = context.getRoot().getBaseUrl();
