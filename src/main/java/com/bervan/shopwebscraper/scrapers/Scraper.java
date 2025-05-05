@@ -283,6 +283,7 @@ public abstract class Scraper {
                 } else if (offerName.length() > 300) {
                     LogUtils.warn(log, context, "Offer Name is probably incorrect, has more than 300 characters: {}", offerName);
                     LogUtils.warn(log, context, "OFFER SKIPPED");
+                    continue;
                 }
 
                 String href = sanitize(getOfferHref(offerElement, context)).trim();

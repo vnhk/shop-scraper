@@ -94,7 +94,9 @@ public class RTVEuroAGDScraper extends Scraper {
             for (Offer offer : productOffers) {
                 String name = offer.get("Name").toString();
                 name = name.replace(commonSubstring, "").trim();
-                offer.put("Name", name);
+                if (name.length() > 3) {
+                    offer.put("Name", name);
+                }
             }
         }
     }
