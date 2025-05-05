@@ -19,6 +19,9 @@ public class SchedulerTasks {
     private final QueueService queueService;
     private final String pathToDriver;
 
+    @Value("${config.read.and.apply}")
+    private Boolean doConfig;
+
     @PostConstruct
     public void initDriver() {
         if (pathToDriver.isBlank()) {
@@ -39,7 +42,9 @@ public class SchedulerTasks {
     @Scheduled(cron = "0 0 3 * * *")
     public void refreshViews() {
         try {
-            queueService.refreshViews();
+            if (doConfig) {
+                queueService.refreshViews();
+            }
         } catch (Exception e) {
             log.error("RefreshingViews: FAILED!", e);
         }
@@ -58,8 +63,10 @@ public class SchedulerTasks {
     @Scheduled(cron = "0 0 * * * *")
     public void scrapAddToQueue() throws InterruptedException {
         try {
-            LocalDateTime now = LocalDateTime.now();
-            scrapProcessor.addToQueue("config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
+            if (doConfig) {
+                LocalDateTime now = LocalDateTime.now();
+                scrapProcessor.addToQueue("config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
+            }
         } catch (Exception e) {
             log.error("scrapAddToQueue: FAILED!", e);
         }
