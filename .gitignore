@@ -39,7 +39,7 @@ build/
 ### VS Code ###
 .vscode/
 
-src/main/resources/application-local.properties
+src/main/resources/application-local*.properties
 /scrap_files_02_12_23__27_01_24/
 /scrap_files_28_01_24__29_01_24/
 /tmp/

@@ -267,6 +267,16 @@
         }
       },
       {
+        "name": "Laptopy",
+        "categories": [
+          "Laptopy"
+        ],
+        "url": "/kategoria/laptopy-31/",
+        "scrapTime": {
+          "hours": 13
+        }
+      },
+      {
         "name": "Czytniki e-booków",
         "categories": [
           "Czytniki e-book"
@@ -423,6 +433,26 @@
         "url": "/smartwatch.bhtml",
         "scrapTime": {
           "hours": 11
+        }
+      },
+      {
+        "name": "Tablety",
+        "categories": [
+          "Tablety"
+        ],
+        "url": "/ipad-i-tablety-multimedialne.bhtml",
+        "scrapTime": {
+          "hours": 17
+        }
+      },
+      {
+        "name": "Laptopy",
+        "categories": [
+          "Laptopy"
+        ],
+        "url": "/laptopy-i-netbooki.bhtml",
+        "scrapTime": {
+          "hours": 13
         }
       },
       {
@@ -672,6 +702,16 @@
         "url": "/komputery-i-tablety/tablety-i-e-booki/tablety",
         "scrapTime": {
           "hours": 17
+        }
+      },
+      {
+        "name": "Laptopy",
+        "categories": [
+          "Laptopy"
+        ],
+        "url": "/komputery-i-tablety/laptopy-i-ultrabooki/laptopy",
+        "scrapTime": {
+          "hours": 13
         }
       },
       {
