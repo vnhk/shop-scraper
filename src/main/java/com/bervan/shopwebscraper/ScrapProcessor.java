@@ -1,6 +1,8 @@
 package com.bervan.shopwebscraper;
 
 import com.bervan.shopwebscraper.scrapers.Scraper;
+import com.bervan.shstat.ConfigRoot;
+import com.bervan.shstat.ScrapContext;
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;

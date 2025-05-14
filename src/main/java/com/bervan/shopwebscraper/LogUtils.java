@@ -1,6 +1,7 @@
 package com.bervan.shopwebscraper;
 
 
+import com.bervan.shstat.ScrapContext;
 import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.slf4j.Logger;
 

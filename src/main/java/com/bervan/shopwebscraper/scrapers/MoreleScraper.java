@@ -1,7 +1,7 @@
 package com.bervan.shopwebscraper.scrapers;
 
 import com.bervan.shopwebscraper.Offer;
-import com.bervan.shopwebscraper.ScrapContext;
+import com.bervan.shstat.ScrapContext;
 import com.bervan.shopwebscraper.SkipProcessingException;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;

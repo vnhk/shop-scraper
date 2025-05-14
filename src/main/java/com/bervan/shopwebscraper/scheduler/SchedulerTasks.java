@@ -60,15 +60,15 @@ public class SchedulerTasks {
 //        }
 //    }
 
-    @Scheduled(cron = "0 0 * * * *")
-    public void scrapAddToQueue() throws InterruptedException {
-        try {
-            if (doConfig) {
-                LocalDateTime now = LocalDateTime.now();
-                scrapProcessor.addToQueue("config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
-            }
-        } catch (Exception e) {
-            log.error("scrapAddToQueue: FAILED!", e);
-        }
-    }
+//    @Scheduled(cron = "0 0 * * * *")
+//    public void scrapAddToQueue() throws InterruptedException {
+//        try {
+//            if (doConfig) {
+//                LocalDateTime now = LocalDateTime.now();
+//                scrapProcessor.addToQueue("config.json", now.getHour(), "RTV Euro AGD", "Morele", "Media Expert");
+//            }
+//        } catch (Exception e) {
+//            log.error("scrapAddToQueue: FAILED!", e);
+//        }
+//    }
 }

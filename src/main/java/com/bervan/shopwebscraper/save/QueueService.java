@@ -2,7 +2,7 @@ package com.bervan.shopwebscraper.save;
 
 import com.bervan.shopwebscraper.logging.LogMessage;
 import com.bervan.shopwebscraper.Offer;
-import com.bervan.shopwebscraper.ScrapContext;
+import com.bervan.shstat.ScrapContext;
 import com.bervan.shstat.queue.QueueMessage;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,8 @@
 package com.bervan.shopwebscraper.scrapers;
 
-import com.bervan.shopwebscraper.ConfigRoot;
+import com.bervan.shstat.ConfigRoot;
 import com.bervan.shopwebscraper.Offer;
-import com.bervan.shopwebscraper.ScrapContext;
+import com.bervan.shstat.ScrapContext;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;

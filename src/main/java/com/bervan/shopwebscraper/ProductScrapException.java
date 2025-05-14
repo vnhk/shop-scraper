@@ -1,5 +1,6 @@
 package com.bervan.shopwebscraper;
 
+import com.bervan.shstat.ConfigProduct;
 import lombok.Getter;
 
 @Getter

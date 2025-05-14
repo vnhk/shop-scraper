@@ -1,4 +1,4 @@
-package com.bervan.shopwebscraper;
+package com.bervan.shstat;
 
 import lombok.Getter;
 import lombok.Setter;
