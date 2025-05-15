@@ -117,7 +117,7 @@ public abstract class Scraper {
             List<Offer> offers = processProduct(context);
 
             LogUtils.info(log, context, "Processed %d offers.", offers.size());
-            saveToFile(context.getRoot(), offers, context);
+//            saveToFile(context.getRoot(), offers, context);
         } finally {
             if (driver != null) {
                 driver.quit();
