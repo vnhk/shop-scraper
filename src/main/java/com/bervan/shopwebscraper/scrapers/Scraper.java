@@ -141,22 +141,22 @@ public abstract class Scraper {
         options.addArguments("--ignore-certificate-errors");
     }
 
-    private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
-        try {
-            if (!offers.isEmpty()) {
-                String filenamePrefix = getFilenamePrefix(config);
-                LogUtils.info(log, context, "Saving to files...");
-                jsonService.save(offers, filenamePrefix);
-                excelService.save(offers, filenamePrefix);
-                LogUtils.info(log, context, "Saved to files...");
-            } else {
-                LogUtils.info(log, context, "No offers to process!");
-            }
-
-        } catch (Exception e) {
-            LogUtils.error(log, context, "Could not save to file!", e);
-        }
-    }
+//    private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
+//        try {
+//            if (!offers.isEmpty()) {
+//                String filenamePrefix = getFilenamePrefix(config);
+//                LogUtils.info(log, context, "Saving to files...");
+//                jsonService.save(offers, filenamePrefix);
+//                excelService.save(offers, filenamePrefix);
+//                LogUtils.info(log, context, "Saved to files...");
+//            } else {
+//                LogUtils.info(log, context, "No offers to process!");
+//            }
+//
+//        } catch (Exception e) {
+//            LogUtils.error(log, context, "Could not save to file!", e);
+//        }
+//    }
 
     protected String getFilenamePrefix(ConfigRoot config) {
         String shopName = config.getShopName().replaceAll(" ", "_")
