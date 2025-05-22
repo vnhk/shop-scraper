@@ -1,11 +1,13 @@
 package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.LogUtils;
 import com.bervan.shopwebscraper.Offer;
-import com.bervan.shstat.ScrapContext;
 import com.bervan.shopwebscraper.SkipProcessingException;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;
+import com.bervan.shstat.ScrapContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service("Morele")
 @Scope("prototype")
+@Slf4j
 public class MoreleScraper extends Scraper {
     public MoreleScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                          @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
@@ -113,6 +116,10 @@ public class MoreleScraper extends Scraper {
             if (outletPrice.equals(price)) {
                 throw new SkipProcessingException("Product is outlet product!");
             }
+        }
+
+        if (Integer.parseInt(price) > 2000) {
+            LogUtils.warn(log, context, "DEBUG MORELE: PRICE BIGGER > 2000: %s", offer.html());
         }
 
         return price;
