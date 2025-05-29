@@ -25,11 +25,6 @@ public class MediaMarktScraper extends Scraper {
 
     private final String PAGE_SIZE = "50";
 
-    @Override
-    public void addToQueue(ConfigRoot config, Date scrapDate, Integer hour) {
-        System.err.println("Not supported... yet....");
-    }
-
     public MediaMarktScraper(JsonService jsonService, ExcelService excelService, QueueService queueService,
                              @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
         super(jsonService, excelService, queueService, userAgents);

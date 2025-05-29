@@ -40,22 +40,6 @@ public class ScrapProcessor {
 
     }
 
-    public void addToQueue(String configFilePath, Integer hour, String... shops) {
-        Date now = new Date();
-        List<ConfigRoot> roots = loadProductsFromConfig(configFilePath);
-
-        for (ConfigRoot root : roots) {
-            String shopName = root.getShopName();
-            if (Arrays.asList(shops).contains(shopName)) {
-                Scraper scraper = scrapers.get(shopName);
-                if (scraper == null) {
-                    throw new RuntimeException("Scraper not found for given shop: " + shopName);
-                }
-                scraper.addToQueue(root, now, hour);
-            }
-        }
-    }
-
     @RabbitListener(queues = "SCRAPER_QUEUE", ackMode = "MANUAL")
     public void processMessage(Message message, Channel channel) throws IOException {
         try {

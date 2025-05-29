@@ -1,12 +1,13 @@
 package com.bervan.shopwebscraper.scrapers;
 
 import ch.qos.logback.core.testUtil.RandomUtil;
-import com.bervan.shopwebscraper.*;
+import com.bervan.shopwebscraper.LogUtils;
+import com.bervan.shopwebscraper.Offer;
+import com.bervan.shopwebscraper.SkipProcessingException;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;
 import com.bervan.shopwebscraper.save.SavingOffersToDBException;
-import com.bervan.shstat.ConfigProduct;
 import com.bervan.shstat.ConfigRoot;
 import com.bervan.shstat.ScrapContext;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 public abstract class Scraper {
@@ -93,21 +97,6 @@ public abstract class Scraper {
         }
     }
 
-    public void addToQueue(ConfigRoot config, Date scrapDate, Integer hour) {
-        for (ConfigProduct product : config.getProducts()) {
-            if (!product.getScrapTime().getHours().equals(hour)) {
-                continue;
-            }
-            ScrapContext context = new ScrapContext();
-            context.setRoot(config);
-            context.setProduct(product);
-            context.setScrapDate(scrapDate);
-
-            LogUtils.info(log, context, "Adding scrapping request to queue!");
-            queueService.addScrapingToQueue(context);
-        }
-    }
-
     public void runOne(ScrapContext context) {
         try {
             LogUtils.info(log, context, "Started runOne!");
@@ -157,12 +146,12 @@ public abstract class Scraper {
 //            LogUtils.error(log, context, "Could not save to file!", e);
 //        }
 //    }
-
-    protected String getFilenamePrefix(ConfigRoot config) {
-        String shopName = config.getShopName().replaceAll(" ", "_")
-                .toUpperCase(Locale.ROOT);
-        return "products_shop_scrap_" + shopName + "-";
-    }
+//
+//    protected String getFilenamePrefix(ConfigRoot config) {
+//        String shopName = config.getShopName().replaceAll(" ", "_")
+//                .toUpperCase(Locale.ROOT);
+//        return "products_shop_scrap_" + shopName + "-";
+//    }
 
     private List<Offer> processProduct(ScrapContext context) {
         String baseUrl = context.getRoot().getBaseUrl();
@@ -314,6 +303,30 @@ public abstract class Scraper {
                 }
 
                 String offerPrice = sanitize(getOfferPrice(offerElement, context));
+
+                try {
+                    int price = Integer.parseInt(offerPrice);
+                    Integer minPrice = context.getProduct().getMinPrice();
+                    Integer maxPrice = context.getProduct().getMaxPrice();
+
+                    if (minPrice != null) {
+                        if (minPrice > price) {
+                            log.error("Price is skipped because price is too small");
+                            continue;
+                        }
+                    }
+
+                    if (maxPrice != null) {
+                        if (maxPrice < price) {
+                            log.error("Price is skipped because price is too big");
+                            continue;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    log.error("Price could not been parsed to int. Skipping");
+                    continue;
+                }
 
                 Offer offer = new Offer();
                 offer.put("Name", offerName);
