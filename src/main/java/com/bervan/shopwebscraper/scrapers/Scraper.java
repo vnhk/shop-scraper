@@ -302,7 +302,7 @@ public abstract class Scraper {
                     messageImgStoppedFlag = false;
                 }
 
-                String offerPrice = sanitize(getOfferPrice(offerElement, context));
+                String offerPrice = sanitize(getOfferPrice(offerElement, context).replaceAll(" ", ""));
 
                 try {
                     int price = Integer.parseInt(offerPrice);
