@@ -68,6 +68,30 @@ public class LogUtils {
                 e);
     }
 
+    public static void error(Logger log, ScrapContext scrapContext, Exception e, String messageFormat, Object... params) {
+        StringFormattedMessage stringFormattedMessage = new StringFormattedMessage(messageFormat, params);
+        log.error("ID={} : {} : {} : {} - {} - {}\n{}",
+                scrapContext.getContextId(),
+                scrapContext.getRoot().getShopName(),
+                getProductName(scrapContext),
+                scrapContext.getScrapDate(),
+                scrapContext.getThread(),
+                stringFormattedMessage,
+                e.getMessage(),
+                e);
+    }
+
+    public static void error(Logger log, ScrapContext scrapContext, String messageFormat, Object... params) {
+        StringFormattedMessage stringFormattedMessage = new StringFormattedMessage(messageFormat, params);
+        log.error("ID={} : {} : {} : {} - {} - {}",
+                scrapContext.getContextId(),
+                scrapContext.getRoot().getShopName(),
+                getProductName(scrapContext),
+                scrapContext.getScrapDate(),
+                scrapContext.getThread(),
+                stringFormattedMessage);
+    }
+
     public static void debug(Logger log, ScrapContext scrapContext, String message) {
         log.debug("ID={} : {} : {} : {} - {} - {}",
                 scrapContext.getContextId(),

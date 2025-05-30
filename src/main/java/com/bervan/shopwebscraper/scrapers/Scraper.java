@@ -311,20 +311,20 @@ public abstract class Scraper {
 
                     if (minPrice != null) {
                         if (minPrice > price) {
-                            log.error("Price is skipped because price is too small");
+                            LogUtils.error(log, context, "Price %s is skipped because price is too small", price);
                             continue;
                         }
                     }
 
                     if (maxPrice != null) {
                         if (maxPrice < price) {
-                            log.error("Price is skipped because price is too big");
+                            LogUtils.error(log, context, "Price %s is skipped because price is too big", price);
                             continue;
                         }
                     }
 
                 } catch (Exception e) {
-                    log.error("Price {} could not been parsed to int. Skipping", offerPrice);
+                    LogUtils.error(log, context, "Price %s could not been mapped", offerPrice);
                     continue;
                 }
 
