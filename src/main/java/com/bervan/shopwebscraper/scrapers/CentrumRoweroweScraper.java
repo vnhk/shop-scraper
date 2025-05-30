@@ -91,6 +91,10 @@ public class CentrumRoweroweScraper extends Scraper {
     @Override
     protected String getOfferImgHref(Element offer, ScrapContext context) {
         String href = getFirstIfFoundAttrByCssQuery(offer, ".photo > img", "data-default");
+        if (!(href.endsWith(".png") || href.endsWith(".img"))) {
+            href = getFirstIfFoundAttrByCssQuery(offer, ".photo > img", "src");
+        }
+
         if (href.startsWith("/")) {
             return context.getRoot().getBaseUrl() + href;
         } else {
