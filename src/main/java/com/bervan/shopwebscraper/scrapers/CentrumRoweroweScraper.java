@@ -80,12 +80,22 @@ public class CentrumRoweroweScraper extends Scraper {
 
     @Override
     protected String getOfferHref(Element offer, ScrapContext context) {
-        return getFirstIfFoundAttrByCssQuery(offer, ".bottom .name > a", "href");
+        String href = getFirstIfFoundAttrByCssQuery(offer, ".bottom .name > a", "href");
+        if (href.startsWith("/")) {
+            return context.getRoot().getBaseUrl() + href;
+        } else {
+            return href;
+        }
     }
 
     @Override
     protected String getOfferImgHref(Element offer, ScrapContext context) {
-        return getFirstIfFoundAttrByCssQuery(offer, ".photo > img", "data-default");
+        String href = getFirstIfFoundAttrByCssQuery(offer, ".photo > img", "data-default");
+        if (href.startsWith("/")) {
+            return context.getRoot().getBaseUrl() + href;
+        } else {
+            return href;
+        }
     }
 
     @Override
