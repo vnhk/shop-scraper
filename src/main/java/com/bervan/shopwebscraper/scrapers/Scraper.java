@@ -324,7 +324,7 @@ public abstract class Scraper {
                     }
 
                 } catch (Exception e) {
-                    log.error("Price could not been parsed to int. Skipping");
+                    log.error("Price {} could not been parsed to int. Skipping", offerPrice);
                     continue;
                 }
 
