@@ -26,10 +26,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 public abstract class Scraper {
@@ -122,6 +119,8 @@ public abstract class Scraper {
 //        options.addArguments("--blink-settings=imagesEnabled=false");
         options.addArguments("--no-sandbox");
         options.addArguments("--headless");
+        String userDataDir = "/tmp/chrome-profile-" + UUID.randomUUID();
+        options.addArguments("--user-data-dir=" + userDataDir);
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
         options.addArguments("--disable-dev-shm-usage");
