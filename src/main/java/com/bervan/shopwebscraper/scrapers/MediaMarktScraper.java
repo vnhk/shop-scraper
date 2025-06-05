@@ -36,11 +36,6 @@ public class MediaMarktScraper extends Scraper {
     }
 
     @Override
-    protected void options() {
-//        options.addArguments("--blink-settings=imagesEnabled=false");
-    }
-
-    @Override
     protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);

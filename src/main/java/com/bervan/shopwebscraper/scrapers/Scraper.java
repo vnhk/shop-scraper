@@ -24,13 +24,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 
 @Slf4j
 public abstract class Scraper {
-    protected final ChromeOptions options = new ChromeOptions();
     //    private ExecutorService executor;
     //no threads better to add new device and run it again with different config/or read from the same queue
     protected WebDriver driver;
@@ -49,7 +49,6 @@ public abstract class Scraper {
 
     public synchronized void create(ConfigRoot config) {
         try {
-            options();
             waitAndRunBrowserToPreventExceptionOnStart(config);
             if (driver != null) {
                 driver.quit();
@@ -59,8 +58,8 @@ public abstract class Scraper {
                 newDriver.quit();
             }
 
-            driver = new ChromeDriver(options);
-            newDriver = new ChromeDriver(options);
+            driver = new ChromeDriver(options());
+            newDriver = new ChromeDriver(options());
         } catch (Exception e) {
             log.error("Could not execute 'create'! {}", e.getMessage());
             if (driver != null) {
@@ -70,23 +69,17 @@ public abstract class Scraper {
             if (newDriver != null) {
                 newDriver.quit();
             }
-            driver = new ChromeDriver(options);
-            newDriver = new ChromeDriver(options);
+            driver = new ChromeDriver(options());
+            newDriver = new ChromeDriver(options());
         }
     }
 
     private void waitAndRunBrowserToPreventExceptionOnStart(ConfigRoot config) {
         try {
-            ChromeDriver driver = new ChromeDriver(options);
+            ChromeDriver driver = new ChromeDriver(options());
             driver.get(config.getBaseUrl());
             driver.quit();
-            driver = new ChromeDriver(options);
-            driver.get(config.getBaseUrl());
-            driver.quit();
-            driver = new ChromeDriver(options);
-            driver.get(config.getBaseUrl());
-            driver.quit();
-            driver = new ChromeDriver(options);
+            driver = new ChromeDriver(options());
             driver.get(config.getBaseUrl());
             driver.quit();
         } catch (Exception e) {
@@ -115,11 +108,12 @@ public abstract class Scraper {
         }
     }
 
-    protected void options() {
+    protected ChromeOptions options() {
+        ChromeOptions options = new ChromeOptions();
 //        options.addArguments("--blink-settings=imagesEnabled=false");
         options.addArguments("--no-sandbox");
         options.addArguments("--headless");
-        String userDataDir = "/tmp/chrome-profile-" + UUID.randomUUID();
+        String userDataDir = "./tmp/chrome-profile-" + UUID.randomUUID();
         options.addArguments("--user-data-dir=" + userDataDir);
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
@@ -127,6 +121,8 @@ public abstract class Scraper {
         options.addArguments("--disable-gpu");
         options.addArguments("--ignore-ssl-errors=yes");
         options.addArguments("--ignore-certificate-errors");
+
+        return options;
     }
 
 //    private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
