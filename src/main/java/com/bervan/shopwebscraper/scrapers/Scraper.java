@@ -113,8 +113,6 @@ public abstract class Scraper {
 //        options.addArguments("--blink-settings=imagesEnabled=false");
         options.addArguments("--no-sandbox");
         options.addArguments("--headless");
-        String userDataDir = "./tmp/chrome-profile-" + UUID.randomUUID();
-        options.addArguments("--user-data-dir=" + userDataDir);
         String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
         options.addArguments("--user-agent=" + userAgent.trim());
         options.addArguments("--disable-dev-shm-usage");
