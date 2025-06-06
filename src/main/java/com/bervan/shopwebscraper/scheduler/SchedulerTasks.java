@@ -37,16 +37,16 @@ public class SchedulerTasks {
         this.queueService = queueService;
     }
 
-    @Scheduled(cron = "0 0 0,6,12,18 * * *")
-    public void refreshViews() {
-        try {
-            if (doConfig) {
-                queueService.refreshViews();
-            }
-        } catch (Exception e) {
-            log.error("RefreshingViews: FAILED!", e);
-        }
-    }
+//    @Scheduled(cron = "0 0 0,6,12,18 * * *")
+//    public void refreshViews() {
+//        try {
+//            if (doConfig) {
+//                queueService.refreshViews();
+//            }
+//        } catch (Exception e) {
+//            log.error("RefreshingViews: FAILED!", e);
+//        }
+//    }
 //
 //    @Scheduled(cron = "0 0 * * * *")
 //    public void refreshFavorites() throws InterruptedException {
