@@ -1,14 +1,15 @@
 package com.bervan.shopwebscraper.scrapers;
 
 import com.bervan.shopwebscraper.Offer;
-import com.bervan.shstat.ScrapContext;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;
+import com.bervan.shstat.ScrapContext;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @Scope("prototype")
 public class MediaExpertScraper extends Scraper {
 
-    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, QueueService queueService, @Value("#{'${USER_AGENTS}'.split(',,,,')}")  List<String> userAgents) {
+    public MediaExpertScraper(JsonService jsonService, ExcelService excelService, QueueService queueService, @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
         super(jsonService, excelService, queueService, userAgents);
     }
 
@@ -34,8 +35,14 @@ public class MediaExpertScraper extends Scraper {
     protected int getNumberOfPages(ScrapContext context) {
         String pageSource = driver.getPageSource();
         Document parsed = Jsoup.parse(pageSource);
-        String pages = parsed.getElementsByClass("pagination").get(0)
-                .getElementsByClass("from").get(0).text();
+        Elements elementsByClass = parsed.getElementsByClass("pagination");
+        if (elementsByClass.isEmpty()) {
+            return 1;
+        }
+        String pages = elementsByClass
+                .get(0)
+                .getElementsByClass("from")
+                .get(0).text();
         return Integer.parseInt(pages.split("z ")[1]);
     }
 
