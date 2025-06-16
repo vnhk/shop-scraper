@@ -51,6 +51,9 @@ public class MoreleScraper extends Scraper {
             System.err.println("Could not find pages! Only one page will be processed!");
             pages = "1";
         }
+        if (pages.isBlank()) {
+            return 1;
+        }
         return Integer.parseInt(pages);
     }
 
