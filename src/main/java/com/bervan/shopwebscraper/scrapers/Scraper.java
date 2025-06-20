@@ -24,27 +24,41 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 public abstract class Scraper {
-    //    private ExecutorService executor;
-    //no threads better to add new device and run it again with different config/or read from the same queue
-    protected WebDriver driver;
-    protected WebDriver newDriver;
     private final JsonService jsonService;
     private final ExcelService excelService;
     private final QueueService queueService;
     private final List<String> userAgents;
+    //    private ExecutorService executor;
+    //no threads better to add new device and run it again with different config/or read from the same queue
+    protected WebDriver driver;
+    protected WebDriver newDriver;
 
     public Scraper(JsonService jsonService, ExcelService excelService, QueueService queueService, List<String> userAgents) {
         this.jsonService = jsonService;
         this.excelService = excelService;
         this.queueService = queueService;
         this.userAgents = userAgents;
+    }
+
+    public static void applyWait(WebDriver driver) {
+        try {
+            if (driver == null) {
+                return;
+            }
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+        } catch (Exception e) {
+            log.error("Could not 'applyWait', Exception: {}", e.getMessage());
+        }
     }
 
     public synchronized void create(ConfigRoot config) {
@@ -108,21 +122,6 @@ public abstract class Scraper {
         }
     }
 
-    protected ChromeOptions options() {
-        ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--blink-settings=imagesEnabled=false");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
-        options.addArguments("--user-agent=" + userAgent.trim());
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--ignore-ssl-errors=yes");
-        options.addArguments("--ignore-certificate-errors");
-
-        return options;
-    }
-
 //    private void saveToFile(ConfigRoot config, List<Offer> offers, ScrapContext context) {
 //        try {
 //            if (!offers.isEmpty()) {
@@ -146,40 +145,43 @@ public abstract class Scraper {
 //        return "products_shop_scrap_" + shopName + "-";
 //    }
 
-    private List<Offer> processProduct(ScrapContext context) {
-        String baseUrl = context.getRoot().getBaseUrl();
-            ScrapContext newContext = new ScrapContext();
-            newContext.setProduct(context.getProduct());
-            newContext.setRoot(context.getRoot());
-            newContext.setThread(context.getThread());
-            newContext.setScrapDate(context.getScrapDate());
-            create(newContext.getRoot());
-                try {
-                    LogUtils.info(log, newContext, "Started processing products.");
-                    List<Offer> productOffers = new ArrayList<>();
+    protected ChromeOptions options() {
+        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--blink-settings=imagesEnabled=false");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless");
+        String userAgent = userAgents.get(RandomUtil.getPositiveInt() % userAgents.size());
+        options.addArguments("--user-agent=" + userAgent.trim());
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--ignore-ssl-errors=yes");
+        options.addArguments("--ignore-certificate-errors");
 
-                    String url = baseUrl + newContext.getProduct().getUrl();
-                    goToFirstPage(url, newContext);
-                    int pages = getNumberOfPages(newContext);
-                    processPages(pages, productOffers, url, newContext);
-
-                    return productOffers;
-                } catch (Exception e) {
-                    LogUtils.error(log, newContext, "Could not parse products:", e);
-                }
-        return new ArrayList<>();
+        return options;
     }
 
-    public static void applyWait(WebDriver driver) {
+    private List<Offer> processProduct(ScrapContext context) {
+        String baseUrl = context.getRoot().getBaseUrl();
+        ScrapContext newContext = new ScrapContext();
+        newContext.setProduct(context.getProduct());
+        newContext.setRoot(context.getRoot());
+        newContext.setThread(context.getThread());
+        newContext.setScrapDate(context.getScrapDate());
+        create(newContext.getRoot());
         try {
-            if (driver == null) {
-                return;
-            }
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-            wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+            LogUtils.info(log, newContext, "Started processing products.");
+            List<Offer> productOffers = new ArrayList<>();
+
+            String url = baseUrl + newContext.getProduct().getUrl();
+            goToFirstPage(url, newContext);
+            int pages = getNumberOfPages(newContext);
+            processPages(pages, productOffers, url, newContext);
+
+            return productOffers;
         } catch (Exception e) {
-            log.error("Could not 'applyWait', Exception: {}", e.getMessage());
+            LogUtils.error(log, newContext, "Could not parse products:", e);
         }
+        return new ArrayList<>();
     }
 
     protected void goToFirstPage(String url, ScrapContext context) {
@@ -295,9 +297,10 @@ public abstract class Scraper {
                     messageImgStoppedFlag = false;
                 }
 
-                String offerPrice = sanitize(getOfferPrice(offerElement, context).replaceAll(" ", ""));
 
+                String offerPrice = "";
                 try {
+                    offerPrice = sanitize(getOfferPrice(offerElement, context).replaceAll(" ", ""));
                     int price = Integer.parseInt(offerPrice);
                     Integer minPrice = context.getProduct().getMinPrice();
                     Integer maxPrice = context.getProduct().getMaxPrice();
