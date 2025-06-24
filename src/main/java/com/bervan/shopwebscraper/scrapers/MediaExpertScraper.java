@@ -64,7 +64,7 @@ public class MediaExpertScraper extends Scraper {
         Elements elementsByClass = doc.getElementsByClass("offer-box");
         if (elementsByClass.size() < 50) {
             try {
-                scrollPage(500, 200);
+                scrollPage(200, 200);
             } catch (InterruptedException e) {
                 LogUtils.error(log, context, "Failed to scroll page!");
             }
