@@ -49,6 +49,27 @@ public abstract class Scraper {
         this.userAgents = userAgents;
     }
 
+    public void scrollPage(int step, int millis) throws InterruptedException {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
+
+        long scrollY = 0;
+
+        while (true) {
+            scrollY += step;
+            js.executeScript("window.scrollTo(0, arguments[0]);", scrollY);
+            Thread.sleep(millis);
+
+            long newHeight = (long) js.executeScript("return document.body.scrollHeight");
+
+            if (scrollY >= newHeight) {
+                break;
+            }
+
+            lastHeight = newHeight;
+        }
+    }
+
     public static void applyWait(WebDriver driver) {
         try {
             if (driver == null) {

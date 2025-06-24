@@ -1,10 +1,12 @@
 package com.bervan.shopwebscraper.scrapers;
 
+import com.bervan.shopwebscraper.LogUtils;
 import com.bervan.shopwebscraper.Offer;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
 import com.bervan.shopwebscraper.save.QueueService;
 import com.bervan.shstat.ScrapContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service("Media Expert")
 @Scope("prototype")
+@Slf4j
 public class MediaExpertScraper extends Scraper {
 
     public MediaExpertScraper(JsonService jsonService, ExcelService excelService, QueueService queueService, @Value("#{'${USER_AGENTS}'.split(',,,,')}") List<String> userAgents) {
@@ -58,7 +61,19 @@ public class MediaExpertScraper extends Scraper {
     @Override
     protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
-        return doc.getElementsByClass("offer-box");
+        Elements elementsByClass = doc.getElementsByClass("offer-box");
+        if (elementsByClass.size() < 50) {
+            try {
+                scrollPage(500, 200);
+            } catch (InterruptedException e) {
+                LogUtils.error(log, context, "Failed to scroll page!");
+            }
+
+            doc = Jsoup.parse(driver.getPageSource());
+            return doc.getElementsByClass("offer-box");
+        } else {
+            return elementsByClass;
+        }
     }
 
     @Override
