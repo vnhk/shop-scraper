@@ -28,6 +28,10 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected String getFirstPageUrlWithParams(String url, ScrapContext context) {
+        MinMaxParam minMaxParam = getMinMaxParam(context);
+        if (minMaxParam.priceCriteria()) {
+            url += "/" + minMaxParam.price;
+        }
         return url + "?limit=50";
     }
 
@@ -59,7 +63,14 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context) {
-        return url + (url.contains("?") ? "&" : "?") + "limit=50&page=" + currentPage;
+        MinMaxParam result = getMinMaxParam(context);
+
+        if (result.priceCriteria() && !url.contains(result.price)) {
+            url += "/" + result.price;
+        }
+        url = url + (url.contains("?") ? "&" : "?") + "limit=50&page=" + currentPage;
+
+        return url;
     }
 
     @Override
@@ -128,5 +139,26 @@ public class MediaExpertScraper extends Scraper {
     @Override
     protected String getOfferName(Element offer, ScrapContext context) {
         return getFirstIfFoundTextByCssQuery(offer, ".name > a");
+    }
+
+    private MinMaxParam getMinMaxParam(ScrapContext context) {
+        Integer minPrice = 1;
+        Integer maxPrice = 10000000;
+        boolean priceCriteria = false;
+        if (context.getProduct().getMinPrice() != null) {
+            minPrice = context.getProduct().getMinPrice();
+            priceCriteria = true;
+        }
+
+        if (context.getProduct().getMaxPrice() != null) {
+            maxPrice = context.getProduct().getMaxPrice();
+            priceCriteria = true;
+        }
+
+        String price = "cena_" + minPrice + "." + maxPrice;
+        return new MinMaxParam(priceCriteria, price);
+    }
+
+    private record MinMaxParam(boolean priceCriteria, String price) {
     }
 }
