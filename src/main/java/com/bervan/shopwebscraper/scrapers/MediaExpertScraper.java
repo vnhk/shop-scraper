@@ -1,6 +1,5 @@
 package com.bervan.shopwebscraper.scrapers;
 
-import com.bervan.shopwebscraper.LogUtils;
 import com.bervan.shopwebscraper.Offer;
 import com.bervan.shopwebscraper.save.ExcelService;
 import com.bervan.shopwebscraper.save.JsonService;
@@ -31,10 +30,10 @@ public class MediaExpertScraper extends Scraper {
 
     @Override
     protected String getFirstPageUrlWithParams(String url, ScrapContext context) {
-        MinMaxParam minMaxParam = getMinMaxParam(context);
-        if (minMaxParam.priceCriteria()) {
-            url += "/" + minMaxParam.price;
-        }
+//        MinMaxParam minMaxParam = getMinMaxParam(context);
+//        if (minMaxParam.priceCriteria()) {
+//            url += "/" + minMaxParam.price;
+//        }
         return url + "?limit=50";
     }
 
@@ -62,27 +61,27 @@ public class MediaExpertScraper extends Scraper {
     protected List<Element> loadAllOffersTiles(ScrapContext context) {
         Document doc = Jsoup.parse(driver.getPageSource());
         Elements elementsByClass = doc.getElementsByClass("offer-box");
-        if (elementsByClass.size() < 50) {
-            try {
-                scrollPage(200, 200);
-            } catch (InterruptedException e) {
-                LogUtils.error(log, context, "Failed to scroll page!");
-            }
-
-            doc = Jsoup.parse(driver.getPageSource());
-            return doc.getElementsByClass("offer-box");
-        } else {
-            return elementsByClass;
-        }
+//        if (elementsByClass.size() < 50) {
+//            try {
+//                scrollPage(200, 200);
+//            } catch (InterruptedException e) {
+//                LogUtils.error(log, context, "Failed to scroll page!");
+//            }
+//
+//            doc = Jsoup.parse(driver.getPageSource());
+//            return doc.getElementsByClass("offer-box");
+//        } else {
+        return elementsByClass;
+//        }
     }
 
     @Override
     protected String getUrlWithParametersForPage(String url, int currentPage, ScrapContext context) {
-        MinMaxParam result = getMinMaxParam(context);
-
-        if (result.priceCriteria() && !url.contains(result.price)) {
-            url += "/" + result.price;
-        }
+//        MinMaxParam result = getMinMaxParam(context);
+//
+//        if (result.priceCriteria() && !url.contains(result.price)) {
+//            url += "/" + result.price;
+//        }
         url = url + (url.contains("?") ? "&" : "?") + "limit=50&page=" + currentPage;
 
         return url;
