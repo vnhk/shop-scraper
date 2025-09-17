@@ -18,7 +18,11 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Service
@@ -27,9 +31,9 @@ public class ScrapProcessor {
     private final Map<String, Scraper> scrapers;
     private final ResourceLoader resourceLoader;
     private final ExecutorService executor;
+    private final Jackson2JsonMessageConverter messageConverter;
     @Value("${logs.path}")
     private String path = "";
-    private final Jackson2JsonMessageConverter messageConverter;
 
     public ScrapProcessor(Map<String, Scraper> scrapers, ResourceLoader resourceLoader,
                           Jackson2JsonMessageConverter messageConverter) {
@@ -44,6 +48,15 @@ public class ScrapProcessor {
     public void processMessage(Message message, Channel channel) throws IOException {
         try {
             ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
+
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(scrapContext.getScrapDate().toInstant(), ZoneId.of("Europe/Warsaw"));
+            if (!LocalDateTime.now().toLocalDate().equals(localDateTime.toLocalDate())) {
+                log.info("Scraping manual ack - skipped, it's not for today!");
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                log.info("Scraping manual ack - skipped, it's not for today! - finished!");
+                return;
+            }
+
             LogUtils.info(log, scrapContext, "Scraping process message started.");
             String shopName = scrapContext.getRoot().getShopName();
 
