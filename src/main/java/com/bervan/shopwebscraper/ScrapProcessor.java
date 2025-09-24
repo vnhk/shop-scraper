@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -49,13 +50,18 @@ public class ScrapProcessor {
         try {
             ScrapContext scrapContext = (ScrapContext) messageConverter.fromMessage(message);
 
-            LocalDateTime localDateTime = LocalDateTime.ofInstant(scrapContext.getScrapDate().toInstant(), ZoneId.of("Europe/Warsaw"));
-            if (!LocalDateTime.now().toLocalDate().equals(localDateTime.toLocalDate())) {
-                log.info("Scraping manual ack - skipped, it's not for today!");
+            LocalDateTime scrapDateTime = LocalDateTime.ofInstant(scrapContext.getScrapDate().toInstant(), ZoneId.of("Europe/Warsaw"));
+            LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Warsaw"));
+            Duration timeDifference = Duration.between(scrapDateTime, now).abs();
+
+            if (timeDifference.toHours() > 24) {
+                log.info("Scraping manual ack - skipped, scrap date is more than 24 hours old/future! Scrap date: {}, Current time: {}, Difference: {} hours",
+                        scrapDateTime, now, timeDifference.toHours());
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-                log.info("Scraping manual ack - skipped, it's not for today! - finished!");
+                log.info("Scraping manual ack - skipped, scrap date is more than 24 hours old/future! - finished!");
                 return;
             }
+
 
             LogUtils.info(log, scrapContext, "Scraping process message started.");
             String shopName = scrapContext.getRoot().getShopName();
@@ -65,7 +71,7 @@ public class ScrapProcessor {
             });
 
             try {
-                future.get(1, TimeUnit.HOURS);
+                future.get(2, TimeUnit.HOURS);
                 LogUtils.info(log, scrapContext, "Scraping process message ended without problems.");
             } catch (TimeoutException e) {
                 future.cancel(true);
