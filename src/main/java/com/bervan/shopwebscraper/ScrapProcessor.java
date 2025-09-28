@@ -57,8 +57,6 @@ public class ScrapProcessor {
             if (timeDifference.toHours() > 24) {
                 log.info("Scraping manual ack - skipped, scrap date is more than 24 hours old/future! Scrap date: {}, Current time: {}, Difference: {} hours",
                         scrapDateTime, now, timeDifference.toHours());
-                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-                log.info("Scraping manual ack - skipped, scrap date is more than 24 hours old/future! - finished!");
                 return;
             }
 
