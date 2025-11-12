@@ -121,10 +121,6 @@ public class MoreleScraper extends Scraper {
             }
         }
 
-        if (Integer.parseInt(price) > 2000) {
-            LogUtils.warn(log, context, "DEBUG MORELE: PRICE BIGGER > 2000: %s", offer.html());
-        }
-
         return price;
     }
 
