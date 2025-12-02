@@ -55,9 +55,13 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
                             Instant.ofEpochMilli(eventObject.getTimeStamp()),
                             ZoneId.systemDefault()
                     ),
+                    null,
                     callerData.getClassName(),
                     callerData.getMethodName(),
-                    callerData.getLineNumber()
+                    null,
+                    null,
+                    callerData.getLineNumber(),
+                    null
             );
         } else {
             logMessage = new LogMessage(
@@ -68,9 +72,13 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
                             Instant.ofEpochMilli(eventObject.getTimeStamp()),
                             ZoneId.systemDefault()
                     ),
+                    null,
                     "",
                     "",
-                    -1
+                    null,
+                    null,
+                    -1,
+                    null
             );
         }
 

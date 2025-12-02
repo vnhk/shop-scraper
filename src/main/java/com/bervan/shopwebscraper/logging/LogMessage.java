@@ -16,7 +16,11 @@ public class LogMessage implements Serializable {
     private String logLevel;
     private String message;
     private LocalDateTime timestamp;
+    private String packageName;
     private String className;
     private String methodName;
-    private int lineNumber;
+    private String processName;
+    private String route;
+    private Integer lineNumber;
+    private String json;
 }
