@@ -60,6 +60,7 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
                     callerData.getMethodName(),
                     null,
                     null,
+                    null,
                     callerData.getLineNumber(),
                     null
             );
@@ -75,6 +76,7 @@ public class QueueAppender extends ConsoleAppender<ILoggingEvent> implements Sma
                     null,
                     "",
                     "",
+                    null,
                     null,
                     null,
                     -1,
